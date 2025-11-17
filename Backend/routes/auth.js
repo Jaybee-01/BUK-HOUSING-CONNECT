@@ -37,6 +37,15 @@ router.post("/login", async (req, res) => {
   res.json(req.session.user);
 });
 
+// logout
+router.post("/logout", (req, res) => { {
+  req.session.destroy((err) => {
+    if (err) return res.status(500).json({ message: "Logout failed" });
+    res.clearCookie("connect.sid");
+    res.json({ message: "Logged out successfully" });
+  });
+}});
+
 // Get current user
 router.get("/me", (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Not logged in" });
