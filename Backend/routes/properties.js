@@ -28,4 +28,30 @@ router.delete("/:id", async (req, res) => {
   res.json({ message: "Deleted" });
 });
 
+// Create a new property
+router.post("/", async (req, res) => {
+  try {
+    const { title, price, contact, type, location, description, image, landlord_id } = req.body;
+
+    if (!title || !price || !contact || !location || !landlord_id) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const [result] = await db.query(
+      `INSERT INTO properties 
+       (title, price, contact, type, location, description, image, landlord_id) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [title, price, contact, type, location, description, image, landlord_id]
+    );
+
+    // Return the newly created property
+    const [newProp] = await db.query("SELECT * FROM properties WHERE id=?", [result.insertId]);
+
+    res.status(201).json(newProp[0]);
+  } catch (err) {
+    console.error("Error creating property:", err);
+    res.status(500).json({ message: "Failed to create property" });
+  }
+});
+
 module.exports = router;
