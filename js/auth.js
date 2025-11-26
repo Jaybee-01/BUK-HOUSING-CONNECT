@@ -1,4 +1,5 @@
-function signup() {
+// Signup 
+async function signup() {
   const name = document.getElementById("signupName").value.trim();
   const email = document
     .getElementById("signupEmail")
@@ -9,36 +10,66 @@ function signup() {
 
   if (!name || !email || !password) return alert("Fill all signup fields.");
 
-  const users = getUsers();
-  if (users.some((u) => u.email === email))
-    return alert("User already exists.");
+  try {
+    const res = await fetch("http://localhost:3000/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password, role }),
+      credentials: "include",
+    });
 
-  users.push({ name, email, password, role });
-  saveUsers(users);
-  alert("Signup successful. You can log in now.");
+    if (res.ok) {
+      alert("Signup successful. You can log in now.");
+      switchToLogin();
+    } else {
+      const data = await res.json();
+      alert(data.message || "Signup failed.");
+    }
+  } catch (err) {
+    alert("Error connecting to server.");
+    console.error(err);
+  }
 }
 
-function login() {
+// Login
+async function login() {
   const email = (
     document.getElementById("loginEmail").value || ""
   ).toLowerCase();
   const password = document.getElementById("loginPassword").value;
 
-  const users = getUsers();
-  const user = users.find((u) => u.email === email && u.password === password);
-  if (!user) return alert("Invalid credentials.");
+  try {
+    const res = await fetch("http://localhost:3000/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include",
+    });
 
-  setLogged(user);
+    const data = await res.json();
 
-  if (user.role === "admin") location.href = "admin.html";
-  else if (user.role === "landlord") location.href = "landlord.html";
-  else if (user.role === "student") location.href = "student.html";
-  else location.href = "index.html";
+    if (res.ok) {
+      // Backend must return role
+      if (!data.role) {
+        alert("Login failed: No role returned.");
+        return;
+      }
+
+      if (data.role === "admin") location.href = "admin.html";
+      else if (data.role === "landlord") location.href = "landlord.html";
+      else if (data.role === "student") location.href = "student.html";
+      else location.href = "index.html";
+    } else {
+      // const data = await res.json();
+      alert(data.message || "Invalid credentials.");
+    }
+  } catch (err) {
+    alert("Error connecting to server.");
+    console.error(err);
+  }
 }
 
-// switching between both forms
-const navBtn = document.getElementById("loginNavBtn");
-const navBtn2 = document.getElementById("signupNavBtn");
+// UI Switching 
 const loginform = document.getElementById("loginForm");
 const signupform = document.getElementById("signupForm");
 const loginformBtn = document.getElementById("loginformBtn");
@@ -46,44 +77,37 @@ const signupformBtn = document.getElementById("signupformBtn");
 const logSecondBtn = document.getElementById("logSecondBtn");
 const signSecondBtn = document.getElementById("signSecondBtn");
 
-loginformBtn.addEventListener("click", () => {
+function switchToLogin() {
   loginform.classList.add("active");
   signupform.classList.remove("active");
   loginformBtn.classList.add("active");
   signupformBtn.classList.remove("active");
-});
-
-signupformBtn.addEventListener("click", () => {
-  loginform.classList.remove("active");
-  signupform.classList.add("active");
-  logSecondBtn.classList.remove("active");
-  signSecondBtn.classList.add("active");
-});
-
-logSecondBtn.addEventListener("click", () => {
-  loginform.classList.add("active");
-  signupform.classList.remove("active");
   logSecondBtn.classList.add("active");
   signSecondBtn.classList.remove("active");
-});
+}
 
-signSecondBtn.addEventListener("click", () => {
-  loginform.classList.remove("active");
+function switchToSignup() {
   signupform.classList.add("active");
-  loginformBtn.classList.remove("active");
-  signupformBtn.classList.add("active");
-});
-
-navBtn.addEventListener("click", () => {
-  loginform.classList.add("active");
-  signupform.classList.remove("active");
-  loginformBtn.classList.add("active");
-  signupformBtn.classList.remove("active");
-});
-
-navBtn2.addEventListener("click", () => {
   loginform.classList.remove("active");
-  signupform.classList.add("active");
-  loginformBtn.classList.remove("active");
   signupformBtn.classList.add("active");
+  loginformBtn.classList.remove("active");
+  signSecondBtn.classList.add("active");
+  logSecondBtn.classList.remove("active");
+}
+
+// Event Listeners
+loginformBtn.addEventListener("click", switchToLogin);
+signupformBtn.addEventListener("click", switchToSignup);
+logSecondBtn.addEventListener("click", switchToLogin);
+signSecondBtn.addEventListener("click", switchToSignup);
+
+// Form Submit
+document.getElementById("loginForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  login();
+});
+
+document.getElementById("signupForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  signup();
 });

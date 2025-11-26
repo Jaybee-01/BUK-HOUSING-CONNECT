@@ -7,7 +7,7 @@ router.get("/", async (req, res) => {
   const [rows] = await db.query(
     `SELECT b.*, u.email AS student_email, p.title AS property_title
      FROM bookings b
-     JOIN users u ON b.student_id = u.id
+     JOIN users u ON b.student_id = student.id
      JOIN properties p ON b.property_id = p.id`
   );
   res.json(rows);

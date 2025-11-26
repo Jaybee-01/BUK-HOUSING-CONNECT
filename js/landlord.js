@@ -1,16 +1,63 @@
-requireRole("landlord");
+// Ensure only landlords access this page
+async function requireLandlord() {
+  const me = await fetchLogged();
+  if (!me || me.role !== "landlord") {
+    window.location.href = "login.html?next=" + encodeURIComponent(location.pathname);
+    return null;
+  }
+  return me;
+}
 
-const form = document.getElementById("propForm");
-const myTableBody = document.getElementById("myPropsTBody");
-const me = getLogged();
+// API Calls
+async function fetchProps() {
+  const res = await fetch("http://localhost:3000/properties");
+  return res.ok ? res.json() : [];
+}
 
-function renderMyProps() {
-  const props = getProps().filter((p) => p.landlord === me.email);
+async function createProp(prop) {
+  const res = await fetch("http://localhost:3000/properties", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(prop),
+    credentials: "include",
+  });
+  return res.ok ? res.json() : null;
+}
+
+async function deleteProp(id) {
+  const res = await fetch(`http://localhost:3000/properties/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  return res.ok;
+}
+
+async function fetchLogged() {
+  const res = await fetch("http://localhost:3000/me", { credentials: "include" });
+  return res.ok ? res.json() : null;
+}
+
+// -------------------- Utilities --------------------
+function genId(prefix = "prop") {
+  return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
+}
+
+function currency(n) {
+  n = Number(n) || 0;
+  return "₦" + n.toLocaleString();
+}
+
+// -------------------- Render Properties --------------------
+async function renderMyProps(me) {
+  const props = (await fetchProps()).filter((p) => p.landlord_id === me.id);
+  const myTableBody = document.getElementById("myPropsTBody");
   myTableBody.innerHTML = "";
-  if (props.length === 0) {
-    myTableBody.innerHTML = `<tr><td colspan="6" class="center">No properties yet.</td></tr>`;
+
+  if (!props.length) {
+    myTableBody.innerHTML = `<tr><td colspan="7" class="center">No properties yet.</td></tr>`;
     return;
   }
+
   props.forEach((p) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -27,45 +74,53 @@ function renderMyProps() {
     myTableBody.appendChild(tr);
   });
 
+  // Attach delete buttons
   myTableBody.querySelectorAll("[data-del]").forEach((btn) => {
-    btn.onclick = () => {
+    btn.onclick = async () => {
       if (!confirm("Delete this property?")) return;
       const id = btn.getAttribute("data-del");
-      const all = getProps().filter((x) => x.id !== id);
-      saveProps(all);
-      renderMyProps();
+      const success = await deleteProp(id);
+      if (success) renderMyProps(me);
+      else alert("Failed to delete property.");
     };
   });
 }
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const fd = new FormData(form);
-  const prop = {
-    id: genId("prop"),
-    title: fd.get("title").toString().trim(),
-    price: Number(fd.get("price") || 0),
-    contact: Number(fd.get("contact")),
-    type: fd.get("type")?.toString().trim().toLowerCase() || "apartment",
-    location: fd.get("location").toString().trim(),
-    description: fd.get("description").toString().trim(),
-    image: fd.get("image").toString().trim(),
-    landlord: me.email,
-    verified: false,
-    createdAt: new Date().toISOString(),
-  };
-  if (!prop.title || !prop.contact || !prop.price || !prop.location)
-    return alert("Title, price, contact and location are required.");
+// -------------------- Handle Form Submission --------------------
+async function setupForm(me) {
+  const form = document.getElementById("propForm");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const prop = {
+      // id: genId("prop"),
+      title: fd.get("title").toString().trim(),
+      price: Number(fd.get("price") || 0),
+      contact: fd.get("contact").toString().trim(),
+      type: fd.get("type")?.toString().trim().toLowerCase() || "apartment",
+      location: fd.get("location").toString().trim(),
+      description: fd.get("description").toString().trim(),
+      image: fd.get("image").toString().trim(),
+      landlord_id: me.id,
+      verified: false,
+      // createdAt: new Date().toISOString(),
+    };
 
-  const props = getProps();
-  props.push(prop);
-  saveProps(props);
+    if (!prop.title || !prop.contact || !prop.price || !prop.location) {
+      return alert("Title, price, contact and location are required.");
+    }
 
-  form.reset();
-  alert(
-    "Property added! It’s now visible on the homepage (Pending verification)."
-  );
-  renderMyProps();
+    await createProp(prop);
+    form.reset();
+    alert("Property added! It’s now visible on the homepage (Pending verification).");
+    renderMyProps(me);
+  });
+}
+
+// -------------------- Initialize --------------------
+document.addEventListener("DOMContentLoaded", async () => {
+  const me = await requireLandlord();
+  if (!me) return; // redirect already handled
+  await renderMyProps(me);
+  await setupForm(me);
 });
-
-document.addEventListener("DOMContentLoaded", renderMyProps);

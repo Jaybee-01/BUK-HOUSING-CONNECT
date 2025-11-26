@@ -3,12 +3,52 @@ const detailsOverlay = document.getElementById("detailsOverlay");
 const detailsWrap = document.getElementById("detailsWrap");
 const bookingModal = document.getElementById("bookingModal");
 
-let currentProperty = null;
+let currentProp = null;
 
-function renderHome() {
-  const props = getProps();
+// -------------------- API Calls --------------------
+async function fetchProps() {
+  const res = await fetch("http://localhost:3000/properties");
+  return res.ok ? res.json() : [];
+}
+
+async function fetchLogged() {
+  const res = await fetch("http://localhost:3000/me", {
+    credentials: "include", // if using cookies for session
+  });
+  return res.ok ? res.json() : null;
+}
+
+async function fetchBookings() {
+  const res = await fetch("http://localhost:3000/bookings");
+  return res.ok ? res.json() : [];
+}
+
+async function createBooking(booking) {
+  const res = await fetch("http://localhost:3000/bookings", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(booking),
+    credentials: "include",
+  });
+  return res.ok ? res.json() : null;
+}
+
+// -------------------- Utilities --------------------
+function genId(prefix = "b") {
+  return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
+}
+
+function currency(n) {
+  n = Number(n) || 0;
+  return "₦" + n.toLocaleString();
+}
+
+// -------------------- Render Home --------------------
+async function renderHome() {
+  const props = await fetchProps();
   listEl.innerHTML = "";
-  if (props.length === 0) {
+
+  if (!props.length) {
     listEl.innerHTML = `<div class="card"><p class="center">No properties yet. Landlords can add from their dashboard.</p></div>`;
     return;
   }
@@ -18,7 +58,6 @@ function renderHome() {
     card.className = "card";
     card.dataset.value = p.price;
     card.dataset.type = (p.type || "").toLowerCase();
-    // card.dataset.type = p.type ? p.type.toLowerCase() : "unknown";
     card.innerHTML = `
       <img src="${
         p.image || "https://via.placeholder.com/400x220?text=Property"
@@ -37,88 +76,72 @@ function renderHome() {
 
   listEl.querySelectorAll("button[data-id]").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      const id = e.currentTarget.getAttribute("data-id");
-      handleViewDetails(id);
+      console.log("Button clicked", e.currentTarget.dataset.id);
+      console.log("Properties rendered", listEl.children.length);
+      console.log(detailsOverlay);
+      
+      handleViewDetails(e.currentTarget.dataset.id);
     });
   });
 }
 
-// Handles the pricerange display
-const priceRange = document.getElementById("priceRange");
-const priceValue = document.getElementById("priceValue");
-
-priceRange.addEventListener("input", () => {
-  priceValue.textContent = Number(priceRange.value).toLocaleString();
-});
-
-// displays property within the price range
+// -------------------- Filters --------------------
 function setupFilters() {
-  const cards = document.querySelectorAll(".card");
+  const priceRange = document.getElementById("priceRange");
+  const priceValue = document.getElementById("priceValue");
 
   priceRange.addEventListener("input", () => {
-    const selectedValue = Number(priceRange.value);
-
-    cards.forEach((card) => {
-      const price = Number(card.dataset.value);
-      if (price == selectedValue) {
-        card.style.display = "block";
-      } else {
-        card.style.display = "none";
-      }
-    });
+    priceValue.textContent = Number(priceRange.value).toLocaleString();
   });
 
-  // Handles the searhInput button
   document.getElementById("searchInput").addEventListener("input", function () {
     const query = this.value.toLowerCase().trim();
     const cards = document.querySelectorAll(".card");
-
     cards.forEach((card) => {
       const location = card
         .querySelector(".location")
-        .getAttribute("data-location")
-        .toLowerCase();
-
-      if (location.includes(query)) {
-        card.style.display = "block";
-      } else {
-        card.style.display = "none";
-      }
+        .dataset.location.toLowerCase();
+      card.style.display = location.includes(query) ? "block" : "none";
     });
   });
 
-
-  // handles the select input
-  const propertyType = document.getElementById("type");
-
-  propertyType.addEventListener("change", () => {
-    const selectedType = propertyType.value.toLowerCase();
-    const cards = document.querySelectorAll(".card");
-
-    cards.forEach((card) => {
+  document.getElementById("type").addEventListener("change", function () {
+    const selectedType = this.value.toLowerCase();
+    document.querySelectorAll(".card").forEach((card) => {
       const type = (card.dataset.type || "").toLowerCase();
+      card.style.display =
+        selectedType === "all" || type === selectedType ? "block" : "none";
+    });
+  });
 
-      if (selectedType === "all" || type === selectedType) {
-        card.style.display = "block";
-      } else {
-        card.style.display = "none";
-      }
+  priceRange.addEventListener("input", () => {
+    const selectedValue = Number(priceRange.value);
+    document.querySelectorAll(".card").forEach((card) => {
+      const price = Number(card.dataset.value);
+      card.style.display = price === selectedValue ? "block" : "none";
     });
   });
 }
 
-function handleViewDetails(id) {
-  const u = getLogged();
+// Property Details
+async function handleViewDetails(id) {
+  console.log("View details for", id);
+  const u = await fetchLogged();
   if (!u || u.role !== "student") {
     alert("You must log in as a Student to view details and book.");
     location.href = "login.html?next=" + encodeURIComponent(location.pathname);
     return;
   }
-  const props = getProps();
-  const p = props.find((x) => x.id === id);
-  if (!p) return;
 
-  currentProperty = p;
+  const props = await fetchProps();
+  const p = props.find((x) => x.id.toString() === id);
+  if (!p){
+    console.log("Property not found", id, propsx);
+    
+    return;
+  } 
+
+  currentProp = p;
 
   detailsWrap.innerHTML = `
     <div class="details-inner">
@@ -135,9 +158,12 @@ function handleViewDetails(id) {
         p.image || "https://via.placeholder.com/1000x560?text=Property"
       }" style="width:100%; border-radius:12px; margin:12px 0; aspect-ratio:16/9; object-fit:cover;">
       <p><strong>Price:</strong> ${currency(p.price)}</p>
-      <p><strong>Contact:</strong><a href="tel:234${p.contact}"> +234 ${p.contact}</a></p>
+      <p><strong>Contact:</strong> <a href="tel:234${p.contact}"> +234 ${
+    p.contact
+  }</a></p>
       <p><strong>Location:</strong> ${p.location}</p>
       <p class="mt-2">${p.description || ""}</p>
+      
       <div class="mt-4">
         <button class="btn" id="bookNow">Book Now</button>
       </div>
@@ -147,37 +173,46 @@ function handleViewDetails(id) {
 
   document.getElementById("closeDetails").onclick = () =>
     (detailsOverlay.style.display = "none");
-  document.getElementById("bookNow").onclick = () => openBooking();
+  document.getElementById("bookNow").onclick = openBooking;
 }
 
+// -------------------- Booking --------------------
 function openBooking() {
-  if (!currentProperty) return;
-  document.getElementById("bkTitle").textContent = currentProperty.title;
+  if (!currentProp) return;
+  document.getElementById("bkTitle").textContent = currentProp.title;
   bookingModal.style.display = "flex";
 }
+
 function closeBooking() {
   bookingModal.style.display = "none";
 }
 
-function confirmBooking() {
-  const u = getLogged();
+async function confirmBooking() {
+  const u = await fetchLogged();
   if (!u || u.role !== "student") return alert("Login as student first.");
+
   const note = document.getElementById("bkNote").value.trim();
-  const bookings = getBookings();
-  bookings.push({
+  const booking = {
     id: genId("b"),
-    propertyId: currentProperty.id,
-    student: u.email,
+    property_id: currentProp.id,
+    student_id: u.id,
     note,
-    createdAt: new Date().toISOString(),
-  });
-  saveBookings(bookings);
+    booking_date: new Date().toISOString(),
+  };
+
+  await createBooking(booking);
   alert("Booking sent to landlord!");
   closeBooking();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderHome();
+//Payment section - fluterwave or paystack(for mockup payment)
+async function makePayment() {
+  alert("Loading.... Payment section on it's way")
+}
+
+// Initialize
+document.addEventListener("DOMContentLoaded", async () => {
+  await renderHome();
   setupFilters();
 });
 

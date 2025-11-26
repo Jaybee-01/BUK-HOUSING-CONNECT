@@ -1,28 +1,63 @@
-requireRole("admin");
-// requireRole("landlord");
-
-const propsBody = document.getElementById("allPropsTBody");
-const lordsBody = document.getElementById("landlordsTBody");
-
-function renderAdmin() {
-  renderProps();
-  renderLandlords();
+//  Utilities
+function currency(n) {
+  n = Number(n) || 0;
+  return "₦" + n.toLocaleString();
 }
 
-function renderProps() {
-  const props = getProps();
+// Fetch API
+async function fetchProps() {
+  const res = await fetch("http://localhost:3000/properties", {
+    credentials: "include",
+  });
+  return res.ok ? res.json() : [];
+}
+
+async function verifyProperty(id) {
+  await fetch(`http://localhost:3000/properties/${id}/verify`, {
+    method: "PATCH",
+    credentials: "include",
+  });
+}
+
+async function deleteProperty(id) {
+  await fetch(`http://localhost:3000/properties/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+}
+
+async function fetchLandlords() {
+  const res = await fetch("http://localhost:3000/users?role=landlord", {
+    credentials: "include",
+  });
+  return res.ok ? res.json() : [];
+}
+
+async function deleteLandlord(id) {
+  await fetch(`http://localhost:3000/users/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+}
+
+// Rendering the Properties on dashboar
+async function renderProps() {
+  const propsBody = document.getElementById("allPropsTBody");
+  const props = await fetchProps();
+
   propsBody.innerHTML = "";
   if (props.length === 0) {
     propsBody.innerHTML = `<tr><td colspan="8" class="center">No properties found.</td></tr>`;
     return;
   }
+
   props.forEach((p) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${p.title}</td>
       <td>${currency(p.price)}</td>
       <td>${p.location}</td>
-      <td>${p.landlord}</td>
+      <td>${p.landlord_email}</td>
       <td>${
         p.verified
           ? '<span class="badge ok">Yes</span>'
@@ -38,69 +73,69 @@ function renderProps() {
   });
 
   propsBody.querySelectorAll("[data-verify]").forEach((btn) => {
-    btn.onclick = () => {
+    btn.onclick = async () => {
       const id = btn.getAttribute("data-verify");
-      const all = getProps();
-      const i = all.findIndex((x) => x.id === id);
-      if (i >= 0) {
-        all[i].verified = !all[i].verified;
-        saveProps(all);
-        renderProps();
-      }
+      await verifyProperty(id);
+      renderProps();
     };
   });
 
   propsBody.querySelectorAll("[data-del]").forEach((btn) => {
-    btn.onclick = () => {
+    btn.onclick = async () => {
       if (!confirm("Delete this property?")) return;
       const id = btn.getAttribute("data-del");
-      saveProps(getProps().filter((x) => x.id !== id));
+      await deleteProperty(id);
       renderProps();
     };
   });
 }
 
-function renderLandlords() {
-  const users = getUsers().filter((u) => u.role === "landlord");
-  const props = getProps(); // this will get all props to access the contact
+// Rendering the Landlords
+async function renderLandlords() {
+  const lordsBody = document.getElementById("landlordsTBody");
+  const landlords = await fetchLandlords();
+  const props = await fetchProps();
+
   lordsBody.innerHTML = "";
-  if (users.length === 0) {
+  if (landlords.length === 0) {
     lordsBody.innerHTML = `<tr><td colspan="4" class="center">No landlords found.</td></tr>`;
     return;
   }
-  users.forEach((u) => {
-    const property = props.find((p) => p.landlord === u.email); // find the landlord property - contact
+
+  landlords.forEach((u) => {
+    const property = props.find((p) => p.landlord_id === u.id);
+    const contact = property ? property.contact : "-";
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${u.name || "-"}</td>
       <td>${u.email}</td>
-      <td>${property ? `0${property.contact}` : "-"}</td> 
+      <td>${contact || "-"}</td>
       <td>landlord</td>
-      <td><button class="btn danger" data-remove="${
-        u.email
-      }">Remove</button></td>
+      <td><button class="btn danger" data-remove="${u.id}">Remove</button></td>
     `;
     lordsBody.appendChild(tr);
   });
 
+  // delete landlord buttons
   lordsBody.querySelectorAll("[data-remove]").forEach((btn) => {
-    btn.onclick = () => {
-      const email = btn.getAttribute("data-remove");
+    btn.onclick = async () => {
+      const id = btn.getAttribute("data-remove");
       if (
-        !confirm(
-          `Remove landlord ${email}? Their properties will also be removed.`
-        )
+        !confirm("Remove this landlord? Their properties will also be removed.")
       )
         return;
-
-      const users = getUsers().filter((x) => x.email !== email);
-      saveUsers(users);
-      saveProps(getProps().filter((p) => p.landlord !== email));
-
+      await deleteLandlord(id);
       renderLandlords();
       renderProps();
     };
   });
+}
+
+// Initialize
+async function renderAdmin() {
+  await renderProps();
+  await renderLandlords();
 }
 
 document.addEventListener("DOMContentLoaded", renderAdmin);

@@ -1,105 +1,69 @@
-// Keys
-const LS = {
-  USERS: "users",
-  LOGGED: "loggedInUser",
-  PROPS: "properties",
-  BOOKS: "bookings",
-};
 
-// Seed admin user once
-(function seedAdmin() {
-  const users = JSON.parse(localStorage.getItem(LS.USERS)) || [];
-  if (!users.some((u) => u.email === "admin@buk.com")) {
-    users.push({
-      name: "Administrator",
-      email: "admin@buk.com",
-      password: "adminpassword",
-      role: "admin",
-    });
-    localStorage.setItem(LS.USERS, JSON.stringify(users));
-  }
-})();
-
-function getUsers() {
-  return JSON.parse(localStorage.getItem(LS.USERS)) || [];
-}
-function saveUsers(u) {
-  localStorage.setItem(LS.USERS, JSON.stringify(u));
-}
-
-function getLogged() {
-  return JSON.parse(localStorage.getItem(LS.LOGGED) || "null");
-}
-function setLogged(u) {
-  if (u) localStorage.setItem(LS.LOGGED, JSON.stringify(u));
-  else localStorage.removeItem(LS.LOGGED);
-}
-
-function getProps() {
-  return JSON.parse(localStorage.getItem(LS.PROPS)) || [];
-}
-function saveProps(p) {
-  localStorage.setItem(LS.PROPS, JSON.stringify(p));
-}
-
-function getBookings() {
-  return JSON.parse(localStorage.getItem(LS.BOOKS)) || [];
-}
-function saveBookings(b) {
-  localStorage.setItem(LS.BOOKS, JSON.stringify(b));
-}
-
-function genId(prefix = "p") {
-  return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
-}
+//Utilities 
 function currency(n) {
   n = Number(n) || 0;
   return "₦" + n.toLocaleString();
 }
 
-function requireRole(role, redirect = "login.html") {
-  const u = getLogged();
+function genId(prefix = "p") {
+  return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
+}
+
+// Role check 
+async function requireRole(role, redirect = "login.html") {
+  const u = await fetchLoggedUser();
   if (!u || (Array.isArray(role) ? !role.includes(u.role) : u.role !== role)) {
-    window.location.href = `${redirect}?next=${encodeURIComponent(
-      location.pathname
-    )}`;
+    window.location.href = `${redirect}?next=${encodeURIComponent(location.pathname)}`;
   }
 }
 
-function logout() {
-  setLogged(null);
-  window.location.href = "index.html";
+//  Fetch logged user 
+async function fetchLoggedUser() {
+  try {
+    const res = await fetch("http://localhost:3000/me", {
+      credentials: "include",
+    });
+    return res.ok ? res.json() : null;
+  } catch (err) {
+    console.error("Error fetching logged user:", err);
+    return null;
+  }
 }
 
-// Handles which user is actually logs in and if no user is logged in it shows 'Guest' and link to login or signup
-function navRender() {
-  const u = getLogged();
+//  Logout 
+async function logout() {
+  try {
+    await fetch("http://localhost:3000/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (err) {
+    console.error("Error logging out:", err);
+  } finally {
+    window.location.href = "index.html";
+  }
+}
+
+//  Navbar render 
+async function navRender() {
+  const u = await fetchLoggedUser();
   const navUser = document.getElementById("navUser");
   const navActions = document.getElementById("navActions1");
-  // const navActions2 = document.getElementById("navActions2");
   if (!navUser || !navActions) return;
+
   if (u) {
     navUser.innerHTML = `${u.name ? u.name.split(" ")[0] : u.email} (<a href="${u.role}.html">${u.role}</a>)`;
-    navActions.innerHTML = `
-      ${u.role === "admin" ? '' : ""}
-      ${u.role === "landlord" ? '' : ""}
-      ${u.role === "student" ? '' : ""}
-      <a href="#" id="logoutLink">Logout</a>
-    `;
-    //the link above is dynamically created
-    setTimeout(() => {
-      //waits for 0 seconds and then set a logout onclick func to it
-      const link = document.getElementById("logoutLink");
-      if (link)
-        link.onclick = (e) => {
-          e.preventDefault();
-          logout();
-        };
-    }, 0);
+    navActions.innerHTML = `<a href="#" id="logoutLink">Logout</a>`;
+
+    const link = document.getElementById("logoutLink");
+    if (link) link.onclick = (e) => {
+      e.preventDefault();
+      logout();
+    };
   } else {
     navUser.textContent = "Guest";
     navActions.innerHTML = `<a href="login.html">Login/Signup</a>`;
-    // navActions2.innerHTML = `<a href="login.html">SignUp</a>`;
   }
 }
+
 document.addEventListener("DOMContentLoaded", navRender);
