@@ -207,7 +207,7 @@ async function confirmBooking() {
 
 //Payment section - fluterwave or paystack(for mockup payment)
 async function makePayment() {
-  alert("Loading.... Payment section on it's way")
+  alert("Loading.... Payment section on it's way stay tuned!");
 }
 
 // Initialize
