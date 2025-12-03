@@ -40,7 +40,9 @@ app.use(
 // Auto-seed Admin User
 (async () => {
   try {
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", ["admin@buk.com"]);
+    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [
+      "admin@buk.com",
+    ]);
     if (rows.length === 0) {
       const hashedPassword = await bcrypt.hash("adminpassword", 10);
       await db.query(
@@ -65,6 +67,9 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/properties", propertyRoutes);
 app.use("/bookings", bookingRoutes);
+
+// express serve the upload folder
+app.use("/uploads", express.static("uploads"));
 
 // --- Start server ---
 app.listen(3000, () => console.log("Server running on port 3000"));
