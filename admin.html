@@ -1,84 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin - BUK Housing Connect</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" href="./img/main-logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Admin - BUK Housing Connect</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="./img/main-logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
-</head>
-
-<body>
-  <nav class="nav">
-    <div class="container">
-      <div class="brand"><a href="index.html"><img src="img/main-logo.png" alt=""></a></div>
-      <div>
-        <!-- <a href="">Admin Panel |</a>
+  <body>
+    <nav class="nav">
+      <div class="container">
+        <div class="brand">
+          <a href="index.html"><img src="img/main-logo.png" alt="" /></a>
+        </div>
+        <div>
+          <!-- <a href="">Admin Panel |</a>
         <a href="index.html">Home</a> -->
-        <span id="navUser"></span>
-        <span id="navActions1" style="margin-left:12px;"></span>
+          <span id="navUser"></span>
+          <span id="navActions1" style="margin-left: 12px"></span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container properties">
+      <h3>All Properties</h3>
+      <div class="table-wrap mt-3">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Price</th>
+              <th>Location</th>
+              <th>Email Address</th>
+              <th>Verified</th>
+              <th>Created</th>
+              <th>Status</th>
+              <th>Verify</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody id="allPropsTBody"></tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-6">Landlords</h3>
+      <div class="table-wrap mt-3">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Role</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="landlordsTBody"></tbody>
+        </table>
       </div>
     </div>
-  </nav>
 
-  <div class="container properties">
-    <h3>All Properties</h3>
-    <div class="table-wrap mt-3">
-      <table>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Location</th>
-            <th>Email Address</th>
-            <th>Verified</th>
-            <th>Created</th>
-            <th>Verify</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody id="allPropsTBody"></tbody>
-      </table>
+    <div id="toastContainer"></div>
+
+    <div id="confirmOverlay">
+      <div class="confirmBox">
+        <h3>Are you sure?</h3>
+        <p>This landlord and all their properties will be removed.</p>
+        <div class="row">
+          <button id="confirmYes" class="btn danger">Delete</button>
+          <button id="confirmNo" class="btn">Cancel</button>
+        </div>
+      </div>
     </div>
 
-    <h3 class="mt-6">Landlords</h3>
-    <div class="table-wrap mt-3">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Contact</th>
-            <th>Role</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="landlordsTBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-
-  <!-- Footer section -->
-  <footer>
-    <section>
-      <img src="img/main-logo.png" alt="" width="150px">
-      <!-- <h1>🏠BUK Housing Connect</h1> -->
-      <p>Your connection to the best student housing near Bayero University, Kano.</p>
-      <hr>
+    <!-- Footer section -->
+    <footer>
       <section>
-        <p>&copy;2025 BUK Housing Connect. All rights reserved.</p>
+        <img src="img/main-logo.png" alt="" width="150px" />
+        <!-- <h1>🏠BUK Housing Connect</h1> -->
+        <p>
+          Your connection to the best student housing near Bayero University,
+          Kano.
+        </p>
+        <hr />
+        <section>
+          <p>&copy;2025 BUK Housing Connect. All rights reserved.</p>
+        </section>
       </section>
-    </section>
-  </footer>
+    </footer>
 
-  <script src="js/utils.js"></script>
-  <script src="js/admin.js"></script>
-</body>
-
+    <script src="./js/main.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
 </html>

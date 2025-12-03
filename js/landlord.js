@@ -81,8 +81,8 @@ async function renderMyProps(me) {
       const id = btn.getAttribute("data-del");
       const success = await deleteProp(id);
       if (success) renderMyProps(me);
-      else alert("Failed to delete property.");
-    };
+      else showToast("Failed to delete property.", 4000);
+    }
   });
 }
 
@@ -107,12 +107,12 @@ async function setupForm(me) {
     };
 
     if (!prop.title || !prop.contact || !prop.price || !prop.location) {
-      return alert("Title, price, contact and location are required.");
+      return showToast("Title, price, contact and location are required.", 4000);
     }
 
     await createProp(prop);
     form.reset();
-    alert("Property added! It’s now visible on the homepage (Pending verification).");
+    showToast("Property added! It’s now visible on the homepage (Pending verification).", "success", 4000);
     renderMyProps(me);
   });
 }

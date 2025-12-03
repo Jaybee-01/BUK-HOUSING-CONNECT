@@ -5,7 +5,7 @@ const bookingModal = document.getElementById("bookingModal");
 
 let currentProp = null;
 
-// -------------------- API Calls --------------------
+//  API Calls
 async function fetchProps() {
   const res = await fetch("http://localhost:3000/properties");
   return res.ok ? res.json() : [];
@@ -30,10 +30,17 @@ async function createBooking(booking) {
     body: JSON.stringify(booking),
     credentials: "include",
   });
-  return res.ok ? res.json() : null;
-}
 
-// -------------------- Utilities --------------------
+  const data = await res.json();
+
+  if (!res.ok) {
+    showToast(data.message || "Booking Failed!", "error", 4000);
+    return null;
+  }
+
+  return data;
+}
+// Utilities
 function genId(prefix = "b") {
   return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
 }
@@ -43,7 +50,7 @@ function currency(n) {
   return "₦" + n.toLocaleString();
 }
 
-// -------------------- Render Home --------------------
+//  Render Home
 async function renderHome() {
   const props = await fetchProps();
   listEl.innerHTML = "";
@@ -66,9 +73,17 @@ async function renderHome() {
       <p class="location" data-location=${p.location}><strong>${currency(
       p.price
     )}</strong> • ${p.location}</p>
-      <p class="mt-2"><span class="badge ${p.verified ? "ok" : "warn"}">${
-      p.verified ? "Verified" : "Pending"
-    }</span></p>
+     <p class="mt-2" style="display:flex; gap:8px; align-items:center;">
+  <span class="badge ${p.verified ? "ok" : "warn"}">
+    ${p.verified ? "Verified" : "Pending"}
+  </span>
+
+  ${
+    p.booked
+      ? `<span class="badge danger" style="background:green; color: white">Booked</span>`
+      : ""
+  }
+</p>
       <button class="btn mt-3" data-id="${p.id}">View Details</button>
     `;
     listEl.appendChild(card);
@@ -76,16 +91,12 @@ async function renderHome() {
 
   listEl.querySelectorAll("button[data-id]").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      console.log("Button clicked", e.currentTarget.dataset.id);
-      console.log("Properties rendered", listEl.children.length);
-      console.log(detailsOverlay);
-      
       handleViewDetails(e.currentTarget.dataset.id);
     });
   });
 }
 
-// -------------------- Filters --------------------
+//  Filters
 function setupFilters() {
   const priceRange = document.getElementById("priceRange");
   const priceValue = document.getElementById("priceValue");
@@ -123,23 +134,50 @@ function setupFilters() {
   });
 }
 
+// For toast Notifications
+function showToast(message, type = "success", duration = 3000) {
+  const container = document.getElementById("toastContainer");
+  if (!container) return console.error("Toast container missing");
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+
+  // Choose icon
+  const icon = type === "success" ? "✔️" : "❌";
+
+  toast.innerHTML = `
+    <i>${icon}</i>
+    <span>${message}</span>
+  `;
+
+  container.appendChild(toast);
+
+  // Auto remove
+  setTimeout(() => {
+    toast.classList.add("fadeOut");
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+}
+
 // Property Details
 async function handleViewDetails(id) {
-  console.log("View details for", id);
   const u = await fetchLogged();
   if (!u || u.role !== "student") {
-    alert("You must log in as a Student to view details and book.");
-    location.href = "login.html?next=" + encodeURIComponent(location.pathname);
+    // location.href = "login.html?next=" + encodeURIComponent(location.pathname);
+    showToast(
+      "You must log in as a Student to view details and book.",
+      "error",
+      4000
+    );
     return;
   }
 
   const props = await fetchProps();
   const p = props.find((x) => x.id.toString() === id);
-  if (!p){
+  if (!p) {
     console.log("Property not found", id, propsx);
-    
     return;
-  } 
+  }
 
   currentProp = p;
 
@@ -176,7 +214,7 @@ async function handleViewDetails(id) {
   document.getElementById("bookNow").onclick = openBooking;
 }
 
-// -------------------- Booking --------------------
+// -------------------- Booking
 function openBooking() {
   if (!currentProp) return;
   document.getElementById("bkTitle").textContent = currentProp.title;
@@ -189,7 +227,8 @@ function closeBooking() {
 
 async function confirmBooking() {
   const u = await fetchLogged();
-  if (!u || u.role !== "student") return alert("Login as student first.");
+  if (!u || u.role !== "student")
+    return showToast("Login as student first.", 4000);
 
   const note = document.getElementById("bkNote").value.trim();
   const booking = {
@@ -200,14 +239,20 @@ async function confirmBooking() {
     booking_date: new Date().toISOString(),
   };
 
-  await createBooking(booking);
-  alert("Booking sent to landlord!");
-  closeBooking();
-}
+  const res = await createBooking(booking);
 
+  if (res) {
+    showToast("Booking sent to landlord!", "success", 4000);
+    closeBooking();
+  }
+}
 //Payment section - fluterwave or paystack(for mockup payment)
 async function makePayment() {
-  alert("Loading.... Payment section on it's way stay tuned!");
+  showToast(
+    "Loading.... Payment section on it's way stay tuned!",
+    "success",
+    4000
+  );
 }
 
 // Initialize

@@ -4,20 +4,36 @@ const router = express.Router();
 
 // Get all properties
 router.get("/", async (req, res) => {
-  const [rows] = await db.query(
-    "SELECT p.*, u.email AS landlord_email FROM properties p JOIN users u ON p.landlord_id = u.id"
-  );
-  res.json(rows);
+  try {
+    const [rows] = await db.query(
+      `
+    SELECT p.*, 
+    u.email AS landlord_email,
+    (SELECT COUNT(*) FROM bookings b WHERE b.property_id = p.id) AS booked
+    FROM properties p 
+    JOIN users u ON p.landlord_id = u.id
+   `
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching properties:", err);
+    res.status(500).json({ message: "Failed to fetch properties" });
+  }
 });
 
 // Verify/unverify property
 router.patch("/:id/verify", async (req, res) => {
   const { id } = req.params;
-  const [rows] = await db.query("SELECT verified FROM properties WHERE id=?", [id]);
+  const [rows] = await db.query("SELECT verified FROM properties WHERE id=?", [
+    id,
+  ]);
   if (!rows.length) return res.status(404).json({ message: "Not found" });
 
   const newStatus = !rows[0].verified;
-  await db.query("UPDATE properties SET verified=? WHERE id=?", [newStatus, id]);
+  await db.query("UPDATE properties SET verified=? WHERE id=?", [
+    newStatus,
+    id,
+  ]);
   res.json({ message: "Updated" });
 });
 
@@ -31,7 +47,16 @@ router.delete("/:id", async (req, res) => {
 // Create a new property
 router.post("/", async (req, res) => {
   try {
-    const { title, price, contact, type, location, description, image, landlord_id } = req.body;
+    const {
+      title,
+      price,
+      contact,
+      type,
+      location,
+      description,
+      image,
+      landlord_id,
+    } = req.body;
 
     if (!title || !price || !contact || !location || !landlord_id) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -45,7 +70,9 @@ router.post("/", async (req, res) => {
     );
 
     // Return the newly created property
-    const [newProp] = await db.query("SELECT * FROM properties WHERE id=?", [result.insertId]);
+    const [newProp] = await db.query("SELECT * FROM properties WHERE id=?", [
+      result.insertId,
+    ]);
 
     res.status(201).json(newProp[0]);
   } catch (err) {

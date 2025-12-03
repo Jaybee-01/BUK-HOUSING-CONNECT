@@ -164,13 +164,12 @@ select {
   display: block;
 }
 
-
 /* code for the form cards */
 .card {
   background: var(--card);
   border-radius: 12px;
   padding: 14px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .card h3 {
@@ -194,7 +193,7 @@ select {
 }
 
 .btn:disabled {
-  opacity: .6;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
@@ -306,7 +305,7 @@ textarea {
 
 #logtype .btn.active {
   border: none;
-  background-color: #E3F2FD;
+  background-color: #e3f2fd;
   /* background-color: #197fc9; */
 }
 
@@ -321,8 +320,7 @@ textarea {
   color: white;
 }
 
-
-@media (max-width:720px) {
+@media (max-width: 720px) {
   .row {
     grid-template-columns: 1fr;
   }
@@ -332,7 +330,7 @@ textarea {
   overflow: auto;
   background: var(--card);
   border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 table {
@@ -390,7 +388,7 @@ th {
 #detailsWrap {
   margin: 0 auto;
   padding: 30px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
 }
 .details-inner {
   max-width: 960px;
@@ -410,7 +408,7 @@ th {
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: rgba(0, 0, 0, .55);
+  background: rgba(0, 0, 0, 0.55);
   align-items: center;
   justify-content: center;
 }
@@ -421,12 +419,12 @@ th {
   max-width: 420px;
   border-radius: 12px;
   padding: 18px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
 }
 
 .badge {
   padding: 4px 8px;
-  font-size: .85rem;
+  font-size: 0.85rem;
   border-radius: 9999px;
   background: #eef2ff;
   color: #3730a3;
@@ -440,6 +438,112 @@ th {
 .badge.warn {
   background: #fff7ed;
   color: #9a3412;
+}
+
+/* code to book property */
+.badge.booked {
+  background: red;
+  color: white;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.badge.available {
+  background: green;
+  color: white;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+
+/* Styles for the toast container */
+#toastContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Toast Box */
+.toast {
+  min-width: 260px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeSlideIn 0.4s ease forwards;
+  opacity: 0;
+}
+
+/* Icons */
+.toast i {
+  font-size: 18px;
+}
+
+.toast.success {
+  background: #16a34a; /* green */
+}
+
+.toast.error {
+  background: #dc2626; /* red */
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fadeOut {
+  animation: fadeOut 0.4s ease forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+/* styles for confirm delete property */
+#confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+}
+
+.confirmBox {
+  background: #fff;
+  padding: 22px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+}
+
+.btn.danger {
+  background: #dc2626;
+  color: #fff;
 }
 
 /* styles for the footer */

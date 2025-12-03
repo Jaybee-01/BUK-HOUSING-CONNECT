@@ -8,7 +8,7 @@ async function signup() {
   const password = document.getElementById("signupPassword").value;
   const role = document.getElementById("signupRole").value;
 
-  if (!name || !email || !password) return alert("Fill all signup fields.");
+  if (!name || !email || !password) return showToast("Fill all signup fields.", "error", 4000);
 
   try {
     const res = await fetch("http://localhost:3000/auth/signup", {
@@ -19,14 +19,14 @@ async function signup() {
     });
 
     if (res.ok) {
-      alert("Signup successful. You can log in now.");
+      showToast("Signup successful. You can log in now.", "success", 4000);
       switchToLogin();
     } else {
       const data = await res.json();
-      alert(data.message || "Signup failed.");
+      showToast(data.message || "Signup failed.", "error", 4000);
     }
   } catch (err) {
-    alert("Error connecting to server.");
+    showToast("Error connecting to server.", "error", 4000);
     console.error(err);
   }
 }
@@ -61,10 +61,10 @@ async function login() {
       else location.href = "index.html";
     } else {
       // const data = await res.json();
-      alert(data.message || "Invalid credentials.");
+      showToast(data.message || "Invalid credentials.", "error", 4000);
     }
   } catch (err) {
-    alert("Error connecting to server.");
+    showToast("Error connecting to server.", "error");
     console.error(err);
   }
 }
