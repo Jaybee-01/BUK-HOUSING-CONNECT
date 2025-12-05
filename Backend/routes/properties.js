@@ -1,7 +1,6 @@
 const express = require("express");
 const db = require("../db");
 const router = express.Router();
-const upload = require("../middlewares/upload");
 
 // Get all properties
 router.get("/", async (req, res) => {
@@ -79,30 +78,6 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.error("Error creating property:", err);
     res.status(500).json({ message: "Failed to create property" });
-  }
-});
-
-// routes for the image uploads
-router.post("/upload", upload.single("image"), async (req, res) => {
-  try {
-    const { title, price, contact, type, location, description, landlord_id } =
-      req.body;
-
-    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
-
-    const [result] = await db.query(
-      `
-        INSERT INTO properties
-        (title, price, contact, type, location, description, image, landlord_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [title, price, contact, type, location, description, image, landlord_id]
-    );
-
-    res.json({ message: "Property created" });
-  } catch (err) {
-    console.error("Error creating property:", err);
-    res.status(500).json({ mesage: "Failed to create property" });
   }
 });
 
