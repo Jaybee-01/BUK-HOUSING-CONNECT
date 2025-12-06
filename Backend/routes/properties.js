@@ -1,6 +1,8 @@
 const express = require("express");
 const db = require("../db");
 const router = express.Router();
+const upload = require("../config/upload");
+
 
 // Get all properties
 router.get("/", async (req, res) => {
@@ -45,7 +47,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // Create a new property
-router.post("/", async (req, res) => {
+router.post("/", upload.single("image"), async (req, res) => {
   try {
     const {
       title,
@@ -54,9 +56,19 @@ router.post("/", async (req, res) => {
       type,
       location,
       description,
-      image,
+      // image,
       landlord_id,
     } = req.body;
+
+    let imageURL = null;
+
+    if (req.file) {
+      imageURL = `${req.protocol}://${req.get("host")}/uploads/properties/${
+        req.file.filename
+      }`;
+    } else if (req.body.image) {
+      imageURL = req.body.image;
+    }
 
     if (!title || !price || !contact || !location || !landlord_id) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -66,11 +78,20 @@ router.post("/", async (req, res) => {
       `INSERT INTO properties 
        (title, price, contact, type, location, description, image, landlord_id) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [title, price, contact, type, location, description, image, landlord_id]
+      [
+        title,
+        price,
+        contact,
+        type,
+        location,
+        description,
+        imageURL,
+        landlord_id,
+      ]
     );
 
     // Return the newly created property
-    const [newProp] = await db.query("SELECT * FROM properties WHERE id=?", [
+    const [newProp] = await db.query("SELECT * FROM properties WHERE id = ?", [
       result.insertId,
     ]);
 

@@ -6,6 +6,40 @@ const session = require("express-session");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const db = require("./db"); // your MySQL connection
+const path = require("path");
+const multer = require("multer");
+const fs = require("fs");
+
+// ensure upload dir exists
+const UPLOAD_BASE = path.join(__dirname, "uploads", "properties");
+if (!fs.existsSync(UPLOAD_BASE)) fs.mkdirSync(UPLOAD_BASE, { recursive: true });
+
+// configure multer storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, UPLOAD_BASE);
+  },
+  filename: function (req, file, cb) {
+    // generate unique filename: timestamp-originalname
+    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+    cb(null, safeName);
+  },
+});
+
+// only accept images
+function fileFilter(req, file, cb) {
+  if (!file.mimetype.startsWith("image/")) {
+    cb(new Error("Only image files are allowed!"), false);
+  } else {
+    cb(null, true);
+  }
+}
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 15 * 1024 * 1024 },
+}); // 5MB limit
 
 // Routes
 const authRoutes = require("./routes/auth");
@@ -37,10 +71,15 @@ app.use(
   })
 );
 
+// static serve uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Auto-seed Admin User
 (async () => {
   try {
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", ["admin@buk.com"]);
+    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [
+      "admin@buk.com",
+    ]);
     if (rows.length === 0) {
       const hashedPassword = await bcrypt.hash("adminpassword", 10);
       await db.query(
