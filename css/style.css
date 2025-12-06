@@ -442,10 +442,10 @@ th {
 
 /* code to book property */
 .badge.booked {
-  background: red;
+  background: #dc2626;
   color: white;
-  padding: 3px 6px;
-  border-radius: 4px;
+  padding: 8px 6px;
+  border-radius: 10px;
   font-weight: bold;
   font-size: 0.85rem;
 }
@@ -458,7 +458,6 @@ th {
   font-weight: bold;
   font-size: 0.85rem;
 }
-
 
 /* Styles for the toast container */
 #toastContainer {
@@ -534,6 +533,24 @@ th {
 }
 
 .confirmBox {
+  background: #fff;
+  padding: 22px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+}
+#confirmOverlay2 {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+}
+
+.confirmBox2 {
   background: #fff;
   padding: 22px;
   border-radius: 10px;

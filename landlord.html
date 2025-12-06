@@ -46,8 +46,11 @@
             <input name="location" class="input" placeholder="e.g., Near New Campus" required>
           </div>
         </div>
-        <label class="mt-2 label">Image URL (optional)</label>
-        <input name="image" class="input" placeholder="https://...">
+        <!-- <label class="mt-2 label">Image URL (optional)</label>
+        <input name="image" class="input" placeholder="https://..."> -->
+
+        <label for="imageUpload" class="mt-2 label">Upload Image</label>
+        <input type="file" name="image" accept="image/" class="input">
 
         <label for="type">Property Type</label>
         <select name="type" id="type" class="select" required>
@@ -58,10 +61,11 @@
         </select>
 
         <label class="mt-2 label">Description</label>
-        <textarea name="description" rows="3" class="input" placeholder="Short description"></textarea>
+        <textarea name="description" rows="3" class="input" placeholder="Short description" required></textarea>
         <button class="btn mt-3" type="submit">Add Property</button>
       </form>
     </div>
+
 
     <div class="mt-6">
       <h3>My Properties</h3>
@@ -70,11 +74,13 @@
           <thead>
             <tr>
               <th>Title</th>
+              <th>Image</th>
               <th>Price</th>
               <th>Contact</th>
               <th>Location</th>
               <th>Verified</th>
               <th>Created</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>

@@ -19,11 +19,18 @@ async function verifyProperty(id) {
   });
 }
 
+// Delete property function
 async function deleteProperty(id) {
-  await fetch(`http://localhost:3000/properties/${id}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
+  try {
+    const res = await fetch(`http://localhost:3000/properties/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    return res.ok;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
 }
 
 async function fetchLandlords() {
@@ -125,11 +132,11 @@ async function renderProps() {
       const id = btn.getAttribute("data-del");
 
       // Show confirmation modal
-      const overlay = document.getElementById("confirmOverlay");
+      const overlay = document.getElementById("confirmOverlay2");
       overlay.style.display = "flex";
 
       // YES button
-      document.getElementById("confirmYes").onclick = async () => {
+      document.getElementById("confirmYes2").onclick = async () => {
         overlay.style.display = "none";
 
         const ok = await deleteProperty(id);
@@ -143,7 +150,7 @@ async function renderProps() {
       };
 
       // NO button
-      document.getElementById("confirmNo").onclick = () => {
+      document.getElementById("confirmNo2").onclick = () => {
         overlay.style.display = "none";
         showToast("Action canceled", "error");
       };

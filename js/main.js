@@ -83,7 +83,7 @@ async function renderHome() {
       ? `<span class="badge danger" style="background:green; color: white">Booked</span>`
       : ""
   }
-</p>
+  </p>
       <button class="btn mt-3" data-id="${p.id}">View Details</button>
     `;
     listEl.appendChild(card);
