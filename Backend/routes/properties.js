@@ -47,59 +47,130 @@ router.delete("/:id", async (req, res) => {
 });
 
 // Create a new property
-router.post("/", upload.single("image"), async (req, res) => {
+// router.post("/", upload.array("images", 5), async (req, res) => {
+//   try {
+//     let imageUrls = [];
+
+//     if(req.file && req.files.length > 0) {  
+//       imageUrls = req.files.map((file) => {
+//         return `${req.protocol}://${req.get("host")}/uploads/properties/${file.filename}`;
+//       }) 
+//     }
+    
+//     const {
+//       title,
+//       price,
+//       contact,
+//       type,
+//       location,
+//       description,
+//       // image,
+//       landlord_id,
+//     } = req.body;
+
+//     // let imageURL = null;
+
+//     // if (req.file) {
+//     //   imageURL = `${req.protocol}://${req.get("host")}/uploads/properties/${
+//     //     req.file.filename
+//     //   }`;
+//     // } else if (req.body.image) {
+//     //   imageURL = req.body.image;
+//     // }
+
+//     // if (!title || !price || !contact || !location || !landlord_id) {
+//     //   return res.status(400).json({ message: "Missing required fields" });
+//     // }
+
+//     const [result] = await db.query(
+//       `INSERT INTO properties 
+//        (title, price, contact, type, location, description, image, landlord_id) 
+//        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+//       [
+//         title,
+//         price,
+//         contact,
+//         type,
+//         location,
+//         description,
+//         imageURL,
+//         landlord_id,
+//       ]
+//     );
+
+//     // Return the newly created property
+//     const [newProp] = await db.query("SELECT * FROM properties WHERE id = ?", [
+//       result.insertId,
+//     ]);
+
+//     res.status(201).json(newProp[0]);
+//   } catch (err) {
+//     console.error("Error creating property:", err);
+//     res.status(500).json({ message: "Failed to create property" });
+//   }
+// });
+
+
+router.post("/", upload.array("images", 5), async (req, res) => {
   try {
+    const files = req.files || [];
+
+    // Build full URLs for each file
+    const imageUrls = files.map(f => {
+      return `http://localhost:3000/uploads/properties/${f.filename}`;
+    });
+
     const {
       title,
       price,
       contact,
-      type,
       location,
       description,
-      // image,
       landlord_id,
+      type,
     } = req.body;
 
-    let imageURL = null;
+    const newProp = {
+      title,
+      price,
+      contact,
+      location,
+      description,
+      landlord_id,
+      type,
+      images: JSON.stringify(imageUrls), 
+      verified: false,
+      createdAt: new Date().toISOString(),
+    };
 
-    if (req.file) {
-      imageURL = `${req.protocol}://${req.get("host")}/uploads/properties/${
-        req.file.filename
-      }`;
-    } else if (req.body.image) {
-      imageURL = req.body.image;
-    }
-
-    if (!title || !price || !contact || !location || !landlord_id) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    const [result] = await db.query(
+    const [result] = await db.execute(
       `INSERT INTO properties 
-       (title, price, contact, type, location, description, image, landlord_id) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (title, price, contact, location, description, landlord_id, type, images, verified, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        title,
-        price,
-        contact,
-        type,
-        location,
-        description,
-        imageURL,
-        landlord_id,
-      ]
+        newProp.title,
+        newProp.price,
+        newProp.contact,
+        newProp.location,
+        newProp.description,
+        newProp.landlord_id,
+        newProp.type,
+        newProp.images,
+        newProp.verified,
+        newProp.createdAt,
+      ],
+      
     );
 
-    // Return the newly created property
-    const [newProp] = await db.query("SELECT * FROM properties WHERE id = ?", [
-      result.insertId,
-    ]);
-
-    res.status(201).json(newProp[0]);
+        return res.json({
+          id: this.lastID,
+          ...newProp,
+        });
   } catch (err) {
     console.error("Error creating property:", err);
-    res.status(500).json({ message: "Failed to create property" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 module.exports = router;
