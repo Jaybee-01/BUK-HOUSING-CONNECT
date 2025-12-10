@@ -184,21 +184,7 @@ async function renderLandlords() {
     `;
     lordsBody.appendChild(tr);
   });
-
-  // // delete landlord buttons
-  // lordsBody.querySelectorAll("[data-remove]").forEach((btn) => {
-  //   btn.onclick = async () => {
-  //     const id = btn.getAttribute("data-remove");
-  //     if (
-  //       !confirm("Remove this landlord? Their properties will also be removed.")
-  //     )
-  //       return;
-  //     await deleteLandlord(id);
-  //     renderLandlords();
-  //     renderProps();
-  //   };
-  // });
-
+  // Remove landlord buttons
   lordsBody.querySelectorAll("[data-remove]").forEach((btn) => {
     btn.onclick = () => {
       const id = btn.getAttribute("data-remove");

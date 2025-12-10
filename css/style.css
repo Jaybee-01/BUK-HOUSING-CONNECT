@@ -164,11 +164,20 @@ select {
 }
 
 /* for the forgot password section */
+#overlay {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(3px);
+  background: rgba(160, 154, 154, 0.4);
+  display: none;
+  z-index: 999;
+}
+
 #forgot-box {
   position: absolute;
   left: 0;
   right: 0;
-  top: 80%; 
+  top: 55%;
   transform: translateY(-50%);
   margin-left: auto;
   margin-right: auto;
@@ -181,14 +190,14 @@ select {
   border-radius: 10px;
   width: 100%;
   max-width: 500px;
+  z-index: 1000;
 
   display: none;
 }
 
-#forgot-box
-input,
-select,
-button{
+#forgot-box input,
+#forgot-box select,
+#forgot-box button {
   width: 100%;
   padding: 10px 12px;
   margin: 5px;
@@ -196,12 +205,34 @@ button{
   border-radius: 8px;
   outline: none;
   background: #fff;
-
 }
 
 #forgot-box button {
   background: var(--primary);
   color: white;
+}
+
+#forgot-box a {
+  text-align: right;
+  font-weight: bold;
+  font-size: 30px;
+  cursor: pointer;
+  color: blue;
+}
+
+#reset h3 {
+  margin: 0;
+}
+#reset {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#request {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* code for the form cards */
@@ -222,14 +253,12 @@ button{
 }
 
 .btn {
-  /* display: inline-block; */
   padding: 10px 14px;
   border: none;
   border-radius: 8px;
   background: var(--primary);
   color: #fff;
   cursor: pointer;
-  /* font-weight: 600; */
 }
 
 .btn:disabled {
@@ -260,13 +289,6 @@ textarea {
   border-radius: 8px;
   outline: none;
   background: #fff;
-  /* 
-  width: 100%;
-    padding: 7px;
-    border: none;
-    border-radius: 10px;
-    margin: 10px 0;
-    box-sizing: border-box; */
 }
 
 .label {
@@ -391,7 +413,7 @@ th {
 }
 
 .mt-2 {
-  margin-top: 8px;
+  margin-top: 20px;
 }
 
 .mt-3 {
@@ -448,8 +470,9 @@ th {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 1000;
   background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
   align-items: center;
   justify-content: center;
 }
@@ -461,6 +484,13 @@ th {
   border-radius: 12px;
   padding: 18px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+.panel a {
+  text-align: right;
+  font-weight: bold;
+  font-size: 30px;
+  cursor: pointer;
+  color: blue;
 }
 
 .badge {
@@ -619,7 +649,6 @@ th {
 }
 
 .slide-img {
-  /* width: 100%; */
   flex-shrink: 0;
   aspect-ratio: 16 / 9;
   object-fit: cover;

@@ -21,10 +21,6 @@
         </div>
         <div>
           <a href="index.html">Home</a>
-          <!-- <div id="logtype">
-          <button class="btn active" id="loginformBtn">Login</button>
-          <button class="btn" id="signupformBtn">SignUp</button>
-        </div> -->
         </div>
       </div>
     </nav>
@@ -56,9 +52,13 @@
             type="password"
             class="input"
             placeholder="********"
-          /> <br>
-          <button class="loginBtn active" onclick="login()">Login</button> <br>
-          <a href="#" onclick="toggleForgot()" style="text-decoration: none;">Forgot Password?</a>
+          />
+          <br />
+          <button class="loginBtn active" onclick="login()">Login</button>
+          <br />
+          <a href="#" onclick="openForgot()" style="text-decoration: none"
+            >Forgot Password?</a
+          >
         </div>
 
         <!-- for sign up -->
@@ -89,7 +89,8 @@
           <select id="signupRole" class="input">
             <option value="student">Student</option>
             <option value="landlord">Landlord</option>
-          </select> <br>
+          </select>
+          <br />
           <button class="signupBtn" onclick="signup()">Sign Up</button>
         </div>
       </div>
@@ -97,9 +98,15 @@
 
     <div id="toastContainer"></div>
 
+    <div id="overlay"></div>
+    
     <!-- forgot password dialogue box -->
     <div id="forgot-box">
-      <h3>Reset Your Password</h3>
+      <div id="reset">
+        <h3>Reset Your Password</h3>
+        <a id="closeForgotMain" class="close-btn">&times;</a>
+      </div>
+
       <form id="forgotForm">
         <input type="text" name="fullname" placeholder="Full Name" required />
         <input type="email" name="email" placeholder="Email Address" required />

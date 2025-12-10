@@ -66,19 +66,21 @@
   <div id="detailsOverlay">
     <div id="detailsWrap"></div>
   </div>
-
+ 
   <!-- Booking Modal -->
   <div class="modal" id="bookingModal">
     <div class="panel">
-      <h3>Request Booking</h3>
-      <p id="bkTitle" class="mt-2"></p>
-      <label class="mt-3">Message (optional)</label>
-      <textarea id="bkNote" rows="3" class="input"
+      <div id="request">
+        <h3>Request Booking</h3>
+        <a class="close-btn" onclick="closeBooking()">&times;</a>
+      </div>
+      <p id="bkTitle" class="" style="font-weight: bold; margin-top: -5px;"></p>
+      <label class="mt-3">Message (optional)</label> <br>
+      <textarea id="bkNote" rows="5" class="input"
         placeholder="Introduce yourself, preferred viewing time, etc."></textarea>
       <div class="mt-3">
         <button class="btn" onclick="confirmBooking()">Confirm</button>
         <button class="btn" onclick="makePayment()">Make Payment</button>
-        <button class="btn danger" onclick="closeBooking()">Cancel</button>
       </div>
     </div>
   </div>

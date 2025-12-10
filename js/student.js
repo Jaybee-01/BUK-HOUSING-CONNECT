@@ -65,86 +65,25 @@ async function sRender() {
     const card = document.createElement("div");
     card.className = "card";
 
+    let firstImage = "https://via.placeholder.com/400x220?text=Property"; // a fallback image just incase the uploaded images did not show
+    try {
+      const imagesArray = JSON.parse(p.images || "[]");
+      if (imagesArray.length) {
+        firstImage = imagesArray[0];
+      }
+    } catch (err) {
+      console.error("Error parsing images for property ID " + p.id + ": ", err);
+    }
+
+
     card.innerHTML = `
-      <img src="${
-        p.image || "https://via.placeholder.com/400x220?text=Property"
+      <img src="${firstImage || "https://via.placeholder.com/400x220?text=Property"
       }" style="width:100%; border-radius:8px; aspect-ratio:16/9; object-fit:cover;">
-      <h3>${p.title}</h3>
-      <p><strong>${currency(p.price)}</strong> • ${p.location}</p>
-      <button class="btn mt-3" data-id="${p.id}">View Details</button>
+      <h3 style="margin-top: 15px;">${p.title}</h3>
+      <p style="margin-top: 15px;"><strong>${currency(p.price)}</strong> • ${p.location}</p>
+      <button class="btn mt-2" data-id="${p.id}" disabled>View Details</button>
     `;
-
-    // if (p.booked > 0) {
-    //   card.innerHTML += `<span class="badged booked
-    //   background: red;
-    //   color: white;
-    //   padding: 4px 8px;
-    //   border-radius: 4px;
-    //   display: inline-block;
-    //   margin-top: 8px;
-    //   fontweight: bold;
-    //   ">
-    //   BOOKED
-    //   </span>`;
-    // }
-
     sList.appendChild(card);
-  });
-
-  // Handle View Details and Booking
-  sList.querySelectorAll("button[data-id]").forEach((btn) => {
-    btn.onclick = async () => {
-      const id = btn.getAttribute("data-id");
-      const p = props.find((x) => x.id === id);
-      if (!p) return;
-
-      currentProp = p;
-
-      sDetailsWrap.innerHTML = `
-        <div class="details-inner mt-details">
-          <div class="details-header">
-            <h2>${p.title}</h2>
-            <button class="btn outline" id="sCloseDetails">Close</button>
-          </div>
-          <img src="${
-            p.image || "https://via.placeholder.com/1000x560?text=Property"
-          }" style="width:100%; border-radius:12px; margin:12px 0; aspect-ratio:16/9; object-fit:cover;">
-          <p><strong>Price:</strong> ${currency(p.price)}</p>
-          <p><strong>Contact:</strong> <a href="tel:234${p.contact}"> +234 ${
-        p.contact
-      }</a></p>
-          <p><strong>Location:</strong> ${p.location}</p>
-          <p class="mt-2">${p.description || ""}</p>
-          <div class="mt-4">
-            <button class="btn" id="sBookNow">Book Now</button>
-          </div>
-        </div>
-      `;
-
-      sDetailsOverlay.style.display = "block";
-      document.getElementById("sCloseDetails").onclick = () =>
-        (sDetailsOverlay.style.display = "none");
-      document.getElementById("sBookNow").onclick = () =>
-        (sBookingModal.style.display = "flex");
-
-      // Handle Confirm Booking
-      document
-        .getElementById("sConfirmBookingBtn")
-        ?.addEventListener("click", async () => {
-          const note = document.getElementById("sBkNote").value.trim();
-          const booking = {
-            id: genId("b"),
-            property_id: currentProp.id,
-            student_id: u.id,
-            note,
-            created_at: new Date().toISOString(),
-          };
-          await createBooking(booking);
-          showToast("Booking sent ohhhhhh!", 7000);
-          document.getElementById("sBkNote").value = "";
-          sBookingModal.style.display = "none";
-        });
-    };
   });
 }
 

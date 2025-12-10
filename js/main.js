@@ -66,7 +66,7 @@ async function renderHome() {
     card.dataset.value = p.price;
     card.dataset.type = (p.type || "").toLowerCase();
 
-    let firstImage = "https://via.placeholder.com/400x220?text=Property"; // a fallback image just incase the uploaded images did not show
+    let firstImage = "../img/main-logo.png"; // a fallback image to the web logo just incase the uploaded images did not show
     try {
       const imagesArray = JSON.parse(p.images || "[]");
       if (imagesArray.length) {
@@ -78,22 +78,22 @@ async function renderHome() {
 
     card.innerHTML = `
       <img src="${firstImage}" style="width:100%; border-radius:8px; aspect-ratio:16/9; object-fit:cover;">
-      <h3>${p.title}</h3>
-      <p class="location" data-location=${p.location}><strong>${currency(
+      <h3 class="mt-2">${p.title}</h3> 
+      <p class="location" style="margin-top: 10px;" data-location=${p.location}><strong>${currency(
       p.price
-    )}</strong> • ${p.location}</p>
-     <p class="mt-2" style="display:flex; gap:8px; align-items:center;">
-  <span class="badge ${p.verified ? "ok" : "warn"}">
-    ${p.verified ? "Verified" : "Pending"}
-  </span>
+        )}</strong>  •  ${p.location}</p>
+     <p class="mt-2" style="display:flex; gap:8px; align-items:center; margin-top: 15px;">
+        <span class="badge ${p.verified ? "ok" : "warn"}">
+           ${p.verified ? "Verified" : "Pending"}
+        </span>
 
-  ${
-    p.booked
-      ? `<span class="badge danger" style="background:green; color: white">Booked</span>`
-      : ""
-  }
-  </p>
-      <button class="btn mt-3" data-id="${p.id}">View Details</button>
+        ${
+          p.booked
+          ? `<span class="badge danger" style="background:green; color: white">Booked</span>`
+          : ""
+        }
+      </p>
+      <button class="btn mt-2" data-id="${p.id}">View Details</button>
     `;
     listEl.appendChild(card);
   });
@@ -232,7 +232,7 @@ async function handleViewDetails(id) {
           <span class="badge ${p.verified ? "ok" : "warn"}">${
     p.verified ? "Verified" : "Pending"
   }</span>
-          <button class="btn outline" id="closeDetails">Close</button>
+        <button class="btn outline" id="closeDetails">Close</button>
         </div>
       </div>
 
@@ -336,43 +336,73 @@ async function makePayment() {
   );
 }
 
-// Only run this if the forgot password form exists on this page
-const forgotForm = document.getElementById("forgotForm");
-if (forgotForm) {
-  function toggleForgot() {
-    const box = document.getElementById("forgot-box");
-    box.style.display = box.style.display === "none" ? "block" : "none";
+// functions for the forgot password modal
+document.addEventListener("DOMContentLoaded", () => {
+  const forgotForm = document.getElementById("forgotForm");
+  const forgotBox = document.getElementById("forgot-box");
+  const overlay = document.getElementById("overlay");
+  const newPassBox = document.getElementById("newPassBox");
+  const closeBtn = document.getElementById("closeForgotMain");
+
+  // Function to open the forgot password modal
+  window.openForgot = () => {
+    overlay.style.display = "block";
+    forgotBox.style.display = "block";
+    newPassBox.style.display = "none"; // hide password box initially
+    forgotForm.reset();
+  };
+
+  // Function to close the forgot password modal
+  function closeForgot() {
+    overlay.style.display = "none";
+    forgotBox.style.display = "none";
+    newPassBox.style.display = "none";
+    forgotForm.reset();
   }
 
-  forgotForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  // Attach close button
+  if (closeBtn) closeBtn.onclick = closeForgot;
 
-    const form = new FormData(e.target);
+  // Optional: close modal if user clicks outside the box
+  overlay.onclick = closeForgot;
 
-    const payload = {
-      name: form.get("fullname").trim(),
-      email: form.get("email").trim(),
-      role: form.get("role").trim(),
-    };
+  // Form submission
+  if (forgotForm) {
+    forgotForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    const res = await fetch("http://localhost:3000/auth/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      const form = new FormData(forgotForm);
+      const payload = {
+        name: form.get("fullname").trim(),
+        email: form.get("email").trim(),
+        role: form.get("role").trim(),
+      };
+
+      try {
+        const res = await fetch("http://localhost:3000/auth/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(
+            data.message || showToast("Error resetting password", "error", 3000)
+          );
+          return;
+        }
+
+        document.getElementById("newPassValue").textContent = data.newPassword;
+        newPassBox.style.display = "block";
+      } catch (err) {
+        console.error(err);
+        showToast("Something went wrong!", "error", 3000);
+      }
     });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message || "Error resetting password");
-      return;
-    }
-
-    document.getElementById("newPassValue").textContent = data.newPassword;
-    document.getElementById("newPassBox").style.display = "block";
-  });
-}
-
+  }
+});
 // Initialize
 document.addEventListener("DOMContentLoaded", async () => {
   await renderHome();
