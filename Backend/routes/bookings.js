@@ -34,7 +34,7 @@ router.post("/", async (req, res) => {
   );
 
   if (existing.length > 0) {
-    return res.status(400).json({ message: "This property has already been booked ohhh." });
+    return res.status(400).json({ message: "This property has already been booked." });
   }
 
   await db.query("INSERT INTO bookings (property_id, student_id, note) VALUES (?,?,?)", [
