@@ -104,6 +104,8 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/properties", propertyRoutes);
 app.use("/bookings", bookingRoutes);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // --- Start server ---
 app.listen(3000, () => console.log("Server running on port 3000"));

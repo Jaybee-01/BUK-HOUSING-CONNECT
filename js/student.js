@@ -140,7 +140,7 @@ async function sRender() {
             created_at: new Date().toISOString(),
           };
           await createBooking(booking);
-          showToast("Booking sent ohhhhhh!", 4000);
+          showToast("Booking sent ohhhhhh!", 7000);
           document.getElementById("sBkNote").value = "";
           sBookingModal.style.display = "none";
         });

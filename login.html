@@ -1,96 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login | Signup - BUK Housing Connect</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" href="./img/main-logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Login | Signup - BUK Housing Connect</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="./img/main-logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
-</head>
-
-<body>
-  <nav class="nav">
-    <div class="container">
-      <div class="brand"><a href="index.html"><img src="img/main-logo.png" alt=""></a></div>
-      <div>
-        <a href="index.html">Home</a>
-        <!-- <div id="logtype">
+  <body>
+    <nav class="nav">
+      <div class="container">
+        <div class="brand">
+          <a href="index.html"><img src="img/main-logo.png" alt="" /></a>
+        </div>
+        <div>
+          <a href="index.html">Home</a>
+          <!-- <div id="logtype">
           <button class="btn active" id="loginformBtn">Login</button>
           <button class="btn" id="signupformBtn">SignUp</button>
         </div> -->
+        </div>
+      </div>
+    </nav>
+
+    <div class="form-container">
+      <div class="form1">
+        <div class="card mycard active" id="loginForm">
+          <h3>Welcome Back!</h3>
+          <p>Login to access your account</p>
+          <div id="logtype">
+            <button class="btn active" id="loginformBtn">Login</button>
+            <button class="btn" id="signupformBtn">SignUp</button>
+          </div>
+
+          <!-- for login -->
+          <p class="mt-2" style="color: var(--muted)">
+            Admin (default): admin@buk.com / adminpassword
+          </p>
+          <label class="mt-2">Email</label>
+          <input
+            id="loginEmail"
+            type="email"
+            class="input"
+            placeholder="you@example.com"
+          />
+          <label class="mt-2">Password</label>
+          <input
+            id="loginPassword"
+            type="password"
+            class="input"
+            placeholder="********"
+          /> <br>
+          <button class="loginBtn active" onclick="login()">Login</button> <br>
+          <a href="#" onclick="toggleForgot()" style="text-decoration: none;">Forgot Password?</a>
+        </div>
+
+        <!-- for sign up -->
+        <div class="card mycard" id="signupForm">
+          <h3>Create an Account</h3>
+          <p>Join our community of Students and Landlords</p>
+          <div id="logtype">
+            <button class="btn active" id="logSecondBtn">Login</button>
+            <button class="btn" id="signSecondBtn">SignUp</button>
+          </div>
+          <label>Full Name</label>
+          <input id="signupName" class="input" placeholder="Your name" />
+          <label class="mt-2">Email</label>
+          <input
+            id="signupEmail"
+            type="email"
+            class="input"
+            placeholder="you@example.com"
+          />
+          <label class="mt-2">Password</label>
+          <input
+            id="signupPassword"
+            type="password"
+            class="input"
+            placeholder="********"
+          />
+          <label class="mt-2">Role</label>
+          <select id="signupRole" class="input">
+            <option value="student">Student</option>
+            <option value="landlord">Landlord</option>
+          </select> <br>
+          <button class="signupBtn" onclick="signup()">Sign Up</button>
+        </div>
       </div>
     </div>
-  </nav>
 
-  <div class="form-container">
-    <div class="form1">
-      <div class="card mycard active" id="loginForm">
-        <h3>Welcome Back!</h3>
-        <p>Login to access your account</p>
-        <div id="logtype">
-          <button class="btn active" id="loginformBtn">Login</button>
-          <button class="btn" id="signupformBtn">SignUp</button>
-        </div>
+    <div id="toastContainer"></div>
 
-        <!-- for login -->
-        <p class="mt-2" style="color:var(--muted);">Admin (default): admin@buk.com / adminpassword</p>
-        <label class="mt-2">Email</label>
-        <input id="loginEmail" type="email" class="input" placeholder="you@example.com">
-        <label class="mt-2">Password</label>
-        <input id="loginPassword" type="password" class="input" placeholder="********">
-        <button class="loginBtn active" onclick="login()">Login</button>
-        <a href="#">Forgot Password?</a>
-
-      </div>
-
-      <!-- for sign up -->
-      <div class="card mycard" id="signupForm">
-        <h3>Create an Account</h3>
-        <p>Join our community of Students and Landlords</p>
-        <div id="logtype">
-          <button class="btn active" id="logSecondBtn">Login</button>
-          <button class="btn" id="signSecondBtn">SignUp</button>
-        </div>
-        <label>Full Name</label>
-        <input id="signupName" class="input" placeholder="Your name">
-        <label class="mt-2">Email</label>
-        <input id="signupEmail" type="email" class="input" placeholder="you@example.com">
-        <label class="mt-2">Password</label>
-        <input id="signupPassword" type="password" class="input" placeholder="********">
-        <label class="mt-2">Role</label>
-        <select id="signupRole" class="input">
+    <!-- forgot password dialogue box -->
+    <div id="forgot-box">
+      <h3>Reset Your Password</h3>
+      <form id="forgotForm">
+        <input type="text" name="fullname" placeholder="Full Name" required />
+        <input type="email" name="email" placeholder="Email Address" required />
+        <select name="role" required>
+          <option value="">Select Role</option>
           <option value="student">Student</option>
           <option value="landlord">Landlord</option>
         </select>
-        <button class="signupBtn" onclick="signup()">Sign Up</button>
+        <button type="submit">Reset Password</button>
+      </form>
+
+      <div id="newPassBox" style="margin-top: 15px; display: none">
+        <p><strong>Your new password is:</strong></p>
+        <div id="newPassValue" style="font-size: 20px; font-weight: bold"></div>
       </div>
     </div>
-  </div>
 
- <div id="toastContainer"></div>
-
-
-
-  <footer>
-    <section>
-      <img src="img/main-logo.png" alt="" width="150px">
-      <!-- <h1>🏠BUK Housing Connect</h1> -->
-      <p>Your connection to the best student housing near Bayero University, Kano.</p>
-      <hr>
+    <footer>
       <section>
-        <p>&copy;2025 BUK Housing Connect. All rights reserved.</p>
+        <img src="img/main-logo.png" alt="" width="150px" />
+        <!-- <h1>🏠BUK Housing Connect</h1> -->
+        <p>
+          Your connection to the best student housing near Bayero University,
+          Kano.
+        </p>
+        <hr />
+        <section>
+          <p>&copy;2025 BUK Housing Connect. All rights reserved.</p>
+        </section>
       </section>
-    </section>
-  </footer>
+    </footer>
 
-  <script src="js/main.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script>
-</body>
-
+    <script src="js/main.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+  </body>
 </html>

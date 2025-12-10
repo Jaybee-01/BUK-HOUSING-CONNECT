@@ -155,13 +155,53 @@ select {
 }
 
 /* to toggle between login and signup */
-
 .mycard {
   display: none;
 }
 
 .mycard.active {
   display: block;
+}
+
+/* for the forgot password section */
+#forgot-box {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 80%; 
+  transform: translateY(-50%);
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+  max-width: 500px;
+  background-color: #fff;
+  box-shadow: 1px 10px 100px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 20px 15px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 500px;
+
+  display: none;
+}
+
+#forgot-box
+input,
+select,
+button{
+  width: 100%;
+  padding: 10px 12px;
+  margin: 5px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+
+}
+
+#forgot-box button {
+  background: var(--primary);
+  color: white;
 }
 
 /* code for the form cards */
@@ -318,6 +358,7 @@ textarea {
   border: none;
   border-radius: 10px;
   color: white;
+  width: 100%;
 }
 
 @media (max-width: 720px) {
@@ -563,6 +604,48 @@ th {
   color: #fff;
 }
 
+/* Styles for the image slider(view details page) */
+.slider-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin: 12px 0;
+  border-radius: 12px;
+}
+
+.slider-track {
+  display: flex;
+  transition: transform 0.4s ease;
+}
+
+.slide-img {
+  /* width: 100%; */
+  flex-shrink: 0;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.slide-btn {
+  position: absolute;
+  top: 45%;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 14px;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 5;
+}
+
+#prevSlide {
+  left: 10px;
+}
+#nextSlide {
+  right: 10px;
+}
+
 /* styles for the footer */
 footer {
   background-color: rgb(241, 242, 245);
@@ -573,7 +656,7 @@ footer {
 }
 
 hr {
-  width: 90%;
+  width: 50%;
 }
 
 footer ul {

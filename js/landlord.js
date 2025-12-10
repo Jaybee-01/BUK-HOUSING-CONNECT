@@ -39,17 +39,17 @@ async function fetchLogged() {
   return res.ok ? res.json() : null;
 }
 
-// -------------------- Utilities --------------------
-function genId(prefix = "prop") {
-  return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
-}
+// function genId(prefix = "prop") {
+//   return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
+// }
 
+//  Utilities
 function currency(n) {
   n = Number(n) || 0;
   return "₦" + n.toLocaleString();
 }
 
-// -------------------- Render Properties --------------------
+// Render Properties
 async function renderMyProps(me) {
   const props = (await fetchProps()).filter((p) => p.landlord_id === me.id);
   const myTableBody = document.getElementById("myPropsTBody");
@@ -61,12 +61,16 @@ async function renderMyProps(me) {
   }
 
   props.forEach((p) => {
+    const images = p.images ? JSON.parse(p.images) : [];
+    const mainImage = images.length
+      ? images[0]
+      : "https://via.placeholder.com/200";
+
     const tr = document.createElement("tr");
+
     tr.innerHTML = `
       <td>${p.title}</td>
-      <td><img src="${
-        p.image
-      }" alt="Property" style="width:70px;height:55px;border-radius:10px;object-fit:cover;" /></td>
+      <td><img src="${mainImage}" alt="Property" style="width:70px;height:55px;border-radius:10px;object-fit:cover;" /></td>
       <td>${currency(p.price)}</td>
       <td>${p.contact}</td>
       <td>${p.location}</td>
@@ -74,10 +78,10 @@ async function renderMyProps(me) {
      
       <td>${new Date(p.createdAt).toLocaleString()}</td>
         <td>${
-         Number(p.booked) > 0
-           ? `<span class="badge booked">${p.booked} Booked</span>`
-           : '<span class="badge available">Available</span>'
-       }</td>
+          Number(p.booked) > 0
+            ? `<span class="badge booked">${p.booked} Booked</span>`
+            : '<span class="badge available">Available</span>'
+        }</td>
       <td>
         <button class="btn danger" data-del="${p.id}">Delete</button>
       </td>
@@ -85,7 +89,7 @@ async function renderMyProps(me) {
     myTableBody.appendChild(tr);
   });
 
-  // Attach delete buttons
+  // Delete buttons
   myTableBody.querySelectorAll("[data-del]").forEach((btn) => {
     btn.onclick = async () => {
       if (!confirm("Delete this property?")) return;
@@ -97,59 +101,34 @@ async function renderMyProps(me) {
   });
 }
 
-// -------------------- Handle Form Submission --------------------
+// Handle Form Submission
 async function setupForm(me) {
   const form = document.getElementById("propForm");
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const fd = new FormData(form);
 
     fd.append("landlord_id", me.id);
-    const success = await createProp(fd);
-    if (success) {
+
+    const result = await createProp(fd);
+
+    if (!result || !result.success) {
       showToast(
         "Property added! It’s now visible on the homepage (Pending verification).",
         "success",
         7000
       );
+    } else {
+      return showToast("Failed to add property.", "error", 7000);
       form.reset();
       renderMyProps(me);
-    } else {
-      showToast("Failed to add property.", "error", 4000);
     }
-    // const prop = {
-    //   // id: genId("prop"),
-    //   title: fd.get("title").toString().trim(),
-    //   price: Number(fd.get("price") || 0),
-    //   contact: fd.get("contact").toString().trim(),
-    //   type: fd.get("type")?.toString().trim().toLowerCase() || "apartment",
-    //   location: fd.get("location").toString().trim(),
-    //   description: fd.get("description").toString().trim(),
-    //   image: fd.get("image").toString().trim(),
-    //   landlord_id: me.id,
-    //   verified: false,
-    //   // createdAt: new Date().toISOString(),
-    // };
-
-    if (!prop.title || !prop.contact || !prop.price || !prop.location) {
-      return showToast(
-        "Title, price, contact and location are required.",
-        4000
-      );
-    }
-
-    await createProp(prop);
-    form.reset();
-    showToast(
-      "Property added! It’s now visible on the homepage (Pending verification).",
-      "success",
-      4000
-    );
-    renderMyProps(me);
   });
 }
 
-// -------------------- Initialize --------------------
+// Initialize
 document.addEventListener("DOMContentLoaded", async () => {
   const me = await requireLandlord();
   if (!me) return; // redirect already handled

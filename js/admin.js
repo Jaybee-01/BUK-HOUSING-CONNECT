@@ -142,17 +142,17 @@ async function renderProps() {
         const ok = await deleteProperty(id);
 
         if (ok) {
-          showToast("Property deleted successfully", "success");
+          showToast("Property deleted successfully", "success", 7000);
           renderProps();
         } else {
-          showToast("Failed to delete property", "error");
+          showToast("Failed to delete property", "error", 7000);
         }
       };
 
       // NO button
       document.getElementById("confirmNo2").onclick = () => {
         overlay.style.display = "none";
-        showToast("Action canceled", "error");
+        showToast("Action canceled", "error", 7000);
       };
     };
   });
@@ -214,18 +214,18 @@ async function renderLandlords() {
         const ok = await deleteLandlord(id);
 
         if (ok) {
-          showToast("Landlord removed successfully", "success");
+          showToast("Landlord removed successfully", "success", 7000);
           renderLandlords();
           renderProps();
         } else {
-          showToast("Failed to remove landlord", "error");
+          showToast("Failed to remove landlord", "error", 7000);
         }
       };
 
       // NO button
       document.getElementById("confirmNo").onclick = () => {
         overlay.style.display = "none";
-        showToast("Action canceled", "error");
+        showToast("Action canceled", "error", 7000);
       };
     };
   });
