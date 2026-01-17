@@ -6,16 +6,19 @@ const router = express.Router();
 // Signup
 router.post("/signup", async (req, res) => {
   const { name, email, password, role } = req.body;
+
   if (!name || !email || !password || !role)
     return res.status(400).json({ message: "Fill all fields" });
 
   const [userExists] = await db.query("SELECT * FROM users WHERE email=?", [
     email,
   ]);
+
   if (userExists.length)
     return res.status(400).json({ message: "User exists" });
 
   const hashed = await bcrypt.hash(password, 10);
+
   await db.query(
     "INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)",
     [name, email, hashed, role]
@@ -26,12 +29,23 @@ router.post("/signup", async (req, res) => {
 
 // Login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const [rows] = await db.query("SELECT * FROM users WHERE email=?", [email]);
+
+  const email = req.body.email.trim().toLowerCase();
+  const password = req.body.password;
+
+  // const { email, password } = req.body;
+  const [rows] = await db.query("SELECT * FROM users WHERE email=?", [
+    email,
+  ]);
+
   const user = rows[0];
   if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
+  // console.log("User from db", user);
+  // console.log("LOGIN BODY:", req.body);
   const match = await bcrypt.compare(password, user.password);
+  // console.log("Password match", match);
+
   if (!match) return res.status(400).json({ message: "Invalid credentials" });
 
   req.session.user = {
@@ -40,6 +54,7 @@ router.post("/login", async (req, res) => {
     role: user.role,
     name: user.name,
   };
+
   res.json(req.session.user);
 });
 
@@ -61,42 +76,7 @@ router.get("/me", (req, res) => {
   res.json(req.session.user);
 });
 
-// forgot password post route
-// router.post("/forgot-password", async (req, res) => {
-//   const { name, email, role } = req.body;
-
-//   if (!name || !email || !role) {
-//     return res.status(400).json({ message: "Please fill all fields" });
-//   }
-
-//   try {
-//     const [rows] = await db.query(
-//       `SELECT * FROM ${users} WHERE name = ? AND email = ? AND role = ?`,
-//       [name, email, role]
-//     );
-
-//     if (!rows || rows.length === 0) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     const newPassword = Math.random().toString(36).slice(-8);
-//     const hashed = await bcrypt.hash(newPassword, 10);
-
-//     await db.query(
-//       `UPDATE ${user} SET password = ? WHERE id = ?`,
-//       [hashed, rows[0].id]
-//     );
-
-//     return res.json({
-//       message: "Password reset successful",
-//       newPassword,
-//     });
-//   } catch (error) {
-//     console.error("Error during password reset:", error);
-//     return res.status(500).json({ message: "Server error" });
-//   }
-// });
-
+// Forgot Password
 router.post("/forgot-password", async (req, res) => {
   const { name, email, role } = req.body; // match frontend 'fullname'
 
@@ -118,10 +98,10 @@ router.post("/forgot-password", async (req, res) => {
     const newPassword = Math.random().toString(36).slice(-8); // random 8-char password
     const hashed = await bcrypt.hash(newPassword, 10);
 
-    await db.query(
-      `UPDATE users SET password = ? WHERE id = ?`,
-      [hashed, rows[0].id]
-    );
+    await db.query(`UPDATE users SET password = ? WHERE id = ?`, [
+      hashed,
+      rows[0].id,
+    ]);
 
     return res.json({
       message: "Password reset successful",
@@ -132,7 +112,5 @@ router.post("/forgot-password", async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
-
-
 
 module.exports = router;

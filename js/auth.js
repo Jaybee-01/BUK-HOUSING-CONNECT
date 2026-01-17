@@ -1,4 +1,4 @@
-// Signup 
+// Signup
 async function signup() {
   const name = document.getElementById("signupName").value.trim();
   const email = document
@@ -8,7 +8,8 @@ async function signup() {
   const password = document.getElementById("signupPassword").value;
   const role = document.getElementById("signupRole").value;
 
-  if (!name || !email || !password) return showToast("Fill all signup fields.", "error", 4000);
+  if (!name || !email || !password)
+    return showToast("Fill all signup fields.", "error", 4000);
 
   try {
     const res = await fetch("http://localhost:3000/auth/signup", {
@@ -69,7 +70,7 @@ async function login() {
   }
 }
 
-// UI Switching 
+// UI Switching
 const loginform = document.getElementById("loginForm");
 const signupform = document.getElementById("signupForm");
 const loginformBtn = document.getElementById("loginformBtn");

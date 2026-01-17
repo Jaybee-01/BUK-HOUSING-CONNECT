@@ -140,13 +140,13 @@ router.post("/", upload.array("images", 5), async (req, res) => {
       type,
       images: JSON.stringify(imageUrls), 
       verified: false,
-      createdAt: new Date().toISOString(),
+      // createdAt: new Date().toISOString(),
     };
 
     const [result] = await db.execute(
       `INSERT INTO properties 
-      (title, price, contact, location, description, landlord_id, type, images, verified, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (title, price, contact, location, description, landlord_id, type, images, verified)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         newProp.title,
         newProp.price,
@@ -157,7 +157,7 @@ router.post("/", upload.array("images", 5), async (req, res) => {
         newProp.type,
         newProp.images,
         newProp.verified,
-        newProp.createdAt,
+        // newProp.createdAt,
       ],
       
     );

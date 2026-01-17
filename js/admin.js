@@ -84,7 +84,7 @@ async function renderProps() {
   }
 
   props.forEach((p) => {
-    console.log(p.id, p.booked);
+    // console.log(p.id, p.booked); //Shows the id and if its bookes(1 yes 0 no)
 
     const tr = document.createElement("tr");
     const created = p.createdAt || p.created_at;

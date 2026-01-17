@@ -1,6 +1,6 @@
 // server.js
 const express = require("express");
-const bodyParser = require("body-parser");
+// const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const cors = require("cors");
@@ -52,11 +52,14 @@ const app = express();
 // --- Middleware ---
 app.use(
   cors({
-    origin: "http://localhost:5500", // frontend URL
+    origin: "http://localhost:5501", // frontend URL
     credentials: true,
   })
 );
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   session({
@@ -70,6 +73,13 @@ app.use(
     },
   })
 );
+
+// --- Routes ---
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
+app.use("/properties", propertyRoutes);
+app.use("/bookings", bookingRoutes);
+
 
 // static serve uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -98,14 +108,6 @@ app.get("/me", (req, res) => {
   if (!req.session.user) return res.status(401).json({ loggedIn: false });
   res.json(req.session.user);
 });
-
-// --- Routes ---
-app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
-app.use("/properties", propertyRoutes);
-app.use("/bookings", bookingRoutes);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // --- Start server ---
 app.listen(3000, () => console.log("Server running on port 3000"));
