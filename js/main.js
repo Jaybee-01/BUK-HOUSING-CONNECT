@@ -88,11 +88,11 @@ async function renderHome() {
            ${p.verified ? "Verified" : "Pending"}
         </span>
 
-        ${
-          p.booked
-            ? `<span class="badge danger" style="background:green; color: white">Booked</span>`
-            : ""
-        }
+       ${
+         Number(p.booked) > 0
+           ? `<span class="badge" style="background: #28a745; color: white;">Booked</span>`
+           : `<span class="badge" style="background: #6c757d; color: white;">Available</span>`
+       }
       </p>
       <button class="btn mt-2" data-id="${p.id}">View Details</button>
     `;
@@ -296,11 +296,11 @@ async function handleViewDetails(id) {
 }
 
 // Booking
-  function openBooking() {
-    if (!currentProp) return;
-    document.getElementById("bkTitle").textContent = currentProp.title;
-    bookingModal.style.display = "flex";
-  }
+function openBooking() {
+  if (!currentProp) return;
+  document.getElementById("bkTitle").textContent = currentProp.title;
+  bookingModal.style.display = "flex";
+}
 
 function closeBooking() {
   bookingModal.style.display = "none";
@@ -309,7 +309,7 @@ function closeBooking() {
 async function confirmBooking() {
   const u = await fetchLogged();
   if (!u || u.role !== "student")
-    return showToast("Login as student first.", 'error', 4000);
+    return showToast("Login as student first.", "error", 4000);
 
   const note = document.getElementById("bkNote").value.trim();
   const booking = {

@@ -46,14 +46,14 @@ async function sRender() {
   if (!u.department || !u.regNo) {
     profileSection.style.display = "block";
     sList.style.display = "none";
-    studentHeader.style.display = "none"; // Hide profile card while editing
-    if(cancelBtn) cancelBtn.style.display = "none";
+    studentHeader.style.display = "none";
+    if (cancelBtn) cancelBtn.style.display = "none";
     setupProfileForm();
   } else {
     // Profile is complete, show the dashboard
     profileSection.style.display = "none";
     sList.style.display = "grid";
-    studentHeader.style.display = "flex"; // Show the profile card
+    studentHeader.style.display = "flex";
 
     // Populate the HTML fields with the user's data
     document.getElementById("userName").innerText = u.name || "Student";
@@ -66,7 +66,7 @@ async function sRender() {
       ? `http://localhost:3000/${u.profileImage}`
       : "https://via.placeholder.com/80?text=User";
 
-    renderProperties(); // Show the listings
+    renderProperties();
   }
 }
 
@@ -98,12 +98,12 @@ function toggleProfileEdit() {
   sList.style.display = "none";
   studentHeader.style.display = "none";
 
-  if(cancelBtn) cancelBtn.style.display = "inline-block";
+  if (cancelBtn) cancelBtn.style.display = "inline-block";
   setupProfileForm();
 }
 
 function closeProfileEdit() {
-  sRender()
+  sRender();
 }
 // --- Render Properties Logic ---
 async function renderProperties() {

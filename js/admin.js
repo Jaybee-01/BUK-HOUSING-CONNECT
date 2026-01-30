@@ -11,14 +11,36 @@ async function fetchProps() {
   });
   return res.ok ? res.json() : [];
 }
-// Fetch API
-// async function fetchProps() {
-//   const res = await fetch("http://localhost:3000/properties", {
-//     credentials: "include",
-//   });
-//   return res.ok ? res.json() : [];
+
+// async function toggleBooked(id) {
+//   const res = await fetch(
+//     `http://localhost:3000/properties/toggle-booked/${id}`,
+//     {
+//       method: "POST",
+//       credentials: "include",
+//     },
+//   );
+//   return res.ok;
 // }
 
+async function toggleBooked(id) {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/properties/toggle-booked/${id}`,
+      {
+        method: "POST",
+        credentials: "include", // THIS IS MANDATORY to send cookies
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    return res.ok;
+  } catch (err) {
+    console.error("Fetch error:", err);
+    return false;
+  }
+}
 async function verifyProperty(id) {
   await fetch(`http://localhost:3000/properties/${id}/verify`, {
     method: "PATCH",
@@ -120,6 +142,7 @@ async function renderProps() {
 
     const tr = document.createElement("tr");
     const created = p.createdAt || p.created_at;
+    const isBooked = Number(p.booked) > 0;
 
     tr.innerHTML = `
       <td>${p.title}</td>
@@ -134,11 +157,11 @@ async function renderProps() {
       }</td>
 
       <td>${created ? new Date(created).toLocaleString() : "N/A"}</td>
-      <td>${
-        Number(p.booked) > 0
-          ? `<span class="badge booked">${p.booked} Booked</span>`
-          : '<span class="badge available">Available</span>'
-      }</td>
+      <td>
+      <button class="btn ${isBooked ? "warn" : "success"}" data-booked="${p.id}">
+        ${isBooked ? "Unbook" : "Book"}
+      </button>
+      </td>
 
 
       <td><button class="btn ok" data-verify="${p.id}">${
@@ -147,6 +170,19 @@ async function renderProps() {
       <td><button class="btn danger" data-del="${p.id}">Delete</button></td>
     `;
     propsBody.appendChild(tr);
+  });
+  // ADDED: Listener for the new booking toggle button
+  propsBody.querySelectorAll("[data-booked]").forEach((btn) => {
+    btn.onclick = async (e) => {
+      const id = btn.getAttribute("data-booked");
+      const ok = await toggleBooked(id); // You'll need the toggleBooked API function
+      if (ok) {
+        showToast("Status updated", "success", 3000);
+        renderProps();
+      } else {
+        showToast("Failed to update status", "error", 4000);
+      }
+    };
   });
 
   // To verify/unverify and delete buttons

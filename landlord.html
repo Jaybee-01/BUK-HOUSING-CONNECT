@@ -111,6 +111,9 @@
       <div id="mainDashboard" style="display: none">
         <div>
           <h3>My Properties</h3>
+          <button class="btn ok" onclick="toggleBookingsTable()">
+            View Bookings
+          </button>
           <button class="btn" onclick="toggleAddForm()">
             + Add New Property
           </button>
@@ -137,7 +140,28 @@
       </div>
 
       <br /><br /><br />
+      <div id="landlordBookingsSection" style="display: none; margin-top: 40px">
+        <hr
+          style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px"
+        />
+        <h3>Property Bookings</h3>
+        <div class="table-wrap mt-3">
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Student Name</th>
+                <th>Student Email</th>
+                <th>Date Booked</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="landlordBookingsTBody"></tbody>
+          </table>
+        </div>
+      </div>
 
+      <br /><br /><br />
       <div
         class="card"
         id="addPropertyWrapper"
