@@ -26,7 +26,11 @@
       </div>
     </nav>
 
-    <div id="landlordProfileSection" class="container2" style="display: none; margin-top: 50px">
+    <div
+      id="landlordProfileSection"
+      class="container2"
+      style="display: none; margin-top: -10px"
+    >
       <div class="container2">
         <h2>Update your Profile</h2>
         <form id="landlordProfileForm">
@@ -51,6 +55,14 @@
           </div>
 
           <button type="submit" class="btn mt-3">Save</button>
+          <button
+            type="button"
+            id="cancelLandlordEdit"
+            class="btn danger mt-3"
+            onclick="closeLandlordEdit()"
+          >
+            Cancel
+          </button>
         </form>
       </div>
     </div>
@@ -78,7 +90,7 @@
           border: 2px solid #007bff;
           margin-left: 95px;
         "
-        />
+      />
       <div>
         <h2 id="landlordName" style="margin: 0"></h2>
         <p style="margin: 5px 0; color: #555">
@@ -96,7 +108,7 @@
 
     <!-- Add properties and my properties -->
     <div class="container addProperty">
-      <div id="mainDashboard" style="display: none;">
+      <div id="mainDashboard" style="display: none">
         <div>
           <h3>My Properties</h3>
           <button class="btn" onclick="toggleAddForm()">

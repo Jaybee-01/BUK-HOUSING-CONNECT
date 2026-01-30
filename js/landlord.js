@@ -2,14 +2,17 @@
 async function requireLandlord() {
   const me = await fetchLogged();
   if (!me || me.role !== "landlord") {
-    window.location.href = "login.html?next=" + encodeURIComponent(location.pathname);
+    window.location.href =
+      "login.html?next=" + encodeURIComponent(location.pathname);
     return null;
   }
   return me;
 }
 
 async function fetchLogged() {
-  const res = await fetch("http://localhost:3000/me", { credentials: "include" });
+  const res = await fetch("http://localhost:3000/me", {
+    credentials: "include",
+  });
   return res.ok ? res.json() : null;
 }
 
@@ -19,7 +22,6 @@ async function fetchProps() {
 }
 
 // --- 2. API ACTIONS ---
-
 async function updateProfile(formData) {
   const res = await fetch("http://localhost:3000/update-profile", {
     method: "POST",
@@ -46,8 +48,7 @@ async function deleteProp(id) {
   return res.ok;
 }
 
-// --- 3. RENDERING & UI LOGIC ---
-
+// render landlord on the interface
 async function lRender() {
   const me = await requireLandlord();
   if (!me) return;
@@ -56,6 +57,7 @@ async function lRender() {
   const landlordHeader = document.getElementById("landlordHeader");
   const mainDashboard = document.getElementById("mainDashboard");
   const addPropertyWrapper = document.getElementById("addPropertyWrapper");
+  const cancelBtn = document.getElementById("cancelLandlordEdit");
 
   // Step A: Check if profile is incomplete
   if (!me.contact) {
@@ -63,8 +65,9 @@ async function lRender() {
     landlordHeader.style.display = "none";
     mainDashboard.style.display = "none";
     addPropertyWrapper.style.display = "none";
+    if (cancelBtn) cancelBtn.style.display = "none";
     setupProfileForm();
-  } 
+  }
   // Step B: Profile is complete, show dashboard
   else {
     profileSection.style.display = "none";
@@ -74,10 +77,10 @@ async function lRender() {
     // Update Header Data
     document.getElementById("landlordName").innerText = me.name || "Landlord";
     document.getElementById("landlordContact").innerText = me.contact;
-    
+
     const avatar = document.getElementById("landlordAvatar");
-    avatar.src = me.profileImage 
-      ? `http://localhost:3000/${me.profileImage}` 
+    avatar.src = me.profileImage
+      ? `http://localhost:3000/${me.profileImage}`
       : "https://via.placeholder.com/80?text=Host";
 
     renderMyProps(me);
@@ -97,7 +100,9 @@ async function renderMyProps(me) {
 
   props.forEach((p) => {
     const images = p.images ? JSON.parse(p.images) : [];
-    const mainImage = images.length ? images[0] : "https://via.placeholder.com/200";
+    const mainImage = images.length
+      ? images[0]
+      : "https://via.placeholder.com/200";
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -119,23 +124,24 @@ async function renderMyProps(me) {
     btn.onclick = async () => {
       if (!confirm("Delete this property?")) return;
       const success = await deleteProp(btn.dataset.del);
-      if (success) lRender(); // Refresh everything
+      if (success) lRender();
     };
   });
 }
 
 // --- 4. FORM HANDLERS & TOGGLES ---
-
 function setupProfileForm() {
   const form = document.getElementById("landlordProfileForm");
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const result = await updateProfile(new FormData(form));
+    const formData = new FormData(form)
+    const result = await updateProfile(formData);
+    
     if (result) {
-      alert("Profile updated!");
+      showToast("Profile updated!", "success", 4000);
       location.reload();
     } else {
-      alert("Error updating profile.");
+      showToast("Error updating profile.", "error", 4000);
     }
   };
 }
@@ -163,16 +169,43 @@ function setupAddPropertyForm(me) {
 function toggleAddForm() {
   const wrap = document.getElementById("addPropertyWrapper");
   wrap.style.display = wrap.style.display === "none" ? "block" : "none";
-  if (wrap.style.display === "block") wrap.scrollIntoView({ behavior: "smooth" });
+  if (wrap.style.display === "block")
+    wrap.scrollIntoView({ behavior: "smooth" });
 }
 
 function toggleProfileEdit() {
-  document.getElementById("landlordProfileSection").style.display = "block";
-  document.getElementById("mainDashboard").style.display = "none";
-  document.getElementById("landlordHeader").style.display = "none";
-  document.getElementById("addPropertyWrapper").style.display = "none";
+  // Fetch current user data from the global 'me' or re-fetch
+  // Assuming 'me' is available or you re-fetch it:
+  fetchLogged().then((me) => {
+    document.getElementById("landlordProfileSection").style.display = "block";
+    document.getElementById("mainDashboard").style.display = "none";
+    document.getElementById("landlordHeader").style.display = "none";
+    document.getElementById("addPropertyWrapper").style.display = "none";
+
+    const cancelBtn = document.getElementById("cancelLandlordEdit");
+    if (cancelBtn) cancelBtn.style.display = "inline-block";
+
+    // PRE-FILL THE CONTACT FIELD
+    const contactInput = document.querySelector(
+      '#landlordProfileForm [name="contact"]',
+    );
+    if (contactInput) contactInput.value = me.contact || "";
+  });
 }
 
+// function toggleProfileEdit() {
+//   document.getElementById("landlordProfileSection").style.display = "block";
+//   document.getElementById("mainDashboard").style.display = "none";
+//   document.getElementById("landlordHeader").style.display = "none";
+//   document.getElementById("addPropertyWrapper").style.display = "none";
+//   const cancelBtn = document.getElementById("cancelLandlordEdit");
+
+//   if(cancelBtn) cancelBtn.style.display = "inline-block"
+// }
+
+function closeLandlordEdit() {
+  lRender();
+}
 function currency(n) {
   return "₦" + (Number(n) || 0).toLocaleString();
 }
