@@ -45,7 +45,7 @@ body {
 
 /* properties - landlord page */
 .addProperty {
-  margin-top: 100px;
+  margin-top: 10px;
   max-width: 1000px;
 }
 /* properties - student page */
@@ -631,6 +631,24 @@ th {
 }
 
 .confirmBox2 {
+  background: #fff;
+  padding: 22px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+}
+#confirmOverlay3 {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+}
+
+.confirmBox3 {
   background: #fff;
   padding: 22px;
   border-radius: 10px;

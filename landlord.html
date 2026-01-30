@@ -26,7 +26,7 @@
       </div>
     </nav>
 
-    <div id="landlordProfileSection" class="container2" style="display: none">
+    <div id="landlordProfileSection" class="container2" style="display: none; margin-top: 50px">
       <div class="container2">
         <h2>Update your Profile</h2>
         <form id="landlordProfileForm">
@@ -55,23 +55,53 @@
       </div>
     </div>
 
-  <div id="landlordHeader" class="card" style="display: none; margin-top: 100px; align-items: center; gap: 20px;">
-    <img id="landlordAvatar" src="" alt="Profile" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #007bff;" />
-    <div>
-      <h2 id="landlordName" style="margin: 0"></h2>
-      <p style="margin: 5px 0; color: #555">
-        <strong>Contact:</strong> <span id="landlordContact"></span>
-      </p>
-      <button class="btn" onclick="toggleProfileEdit()" style="padding: 5px 10px; font-size: 0.8rem">Edit Profile</button>
+    <div
+      id="landlordHeader"
+      class="card"
+      style="
+        display: none;
+        display: flex;
+        margin-top: 100px;
+        align-items: center;
+        gap: 20px;
+      "
+    >
+      <img
+        id="landlordAvatar"
+        src=""
+        alt="Profile"
+        style="
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #007bff;
+          margin-left: 95px;
+        "
+        />
+      <div>
+        <h2 id="landlordName" style="margin: 0"></h2>
+        <p style="margin: 5px 0; color: #555">
+          <strong>Contact:</strong> <span id="landlordContact"></span>
+        </p>
+        <button
+          class="btn"
+          onclick="toggleProfileEdit()"
+          style="padding: 5px 10px; font-size: 0.8rem"
+        >
+          Edit Profile
+        </button>
+      </div>
     </div>
-  </div>
 
     <!-- Add properties and my properties -->
     <div class="container addProperty">
-      <div id="mainDashboard" style="display: none">
-        <div class="mt-6">
+      <div id="mainDashboard" style="display: none;">
+        <div>
           <h3>My Properties</h3>
-          <button class="btn" onclick="toggleAddForm()">+ Add New Property</button>
+          <button class="btn" onclick="toggleAddForm()">
+            + Add New Property
+          </button>
           <div class="table-wrap mt-3">
             <table>
               <thead>
@@ -94,89 +124,94 @@
         </div>
       </div>
 
-      <div id="addPropertyWrapper" class="card mt-4" style="display: none" >
-        <div class="card">
-          <h3>Add Property</h3>
-          <form id="propForm" class="mt-6">
-            <label>Title</label>
-            <input
-              name="title"
-              class="input"
-              placeholder="e.g., 2 Bedroom Apartment"
-              required
-            />
-            <div class="row">
-              <div>
-                <label class="mt-2 label">Price (₦)</label>
-                <input
-                  name="price"
-                  type="number"
-                  class="input"
-                  placeholder="e.g., 250000"
-                  required
-                />
-              </div>
-              <div>
-                <label class="mt-2 label">Contact</label>
-                <input
-                  type="tel"
-                  name="contact"
-                  class="input"
-                  id="phone"
-                  placeholder="e.g. +2348012345678"
-                  required
-                />
-              </div>
-              <div>
-                <label class="mt-2 label">Location</label>
-                <input
-                  name="location"
-                  class="input"
-                  placeholder="e.g., Near New Campus"
-                  required
-                />
-              </div>
-              <div>
-                <label for="propertyLink" class="mt-2 label"
-                  >Share Property Location Link</label
-                >
-                <input
-                  name="live_location_link"
-                  class="input"
-                  placeholder="Paste the share link here (e.g https://maps../..)"
-                  title="must be a valid google map share link"
-                />
-              </div>
+      <br /><br /><br />
+
+      <div
+        class="card"
+        id="addPropertyWrapper"
+        class="card mt-4"
+        style="display: none"
+      >
+        <h3>Add Property</h3>
+        <form id="propForm" class="mt-6">
+          <label>Title</label>
+          <input
+            name="title"
+            class="input"
+            placeholder="e.g., 2 Bedroom Apartment"
+            required
+          />
+          <div class="row">
+            <div>
+              <label class="mt-2 label">Price (₦)</label>
+              <input
+                name="price"
+                type="number"
+                class="input"
+                placeholder="e.g., 250000"
+                required
+              />
             </div>
+            <div>
+              <label class="mt-2 label">Contact</label>
+              <input
+                type="tel"
+                name="contact"
+                class="input"
+                id="phone"
+                placeholder="e.g. +2348012345678"
+                required
+              />
+            </div>
+            <div>
+              <label class="mt-2 label">Location</label>
+              <input
+                name="location"
+                class="input"
+                placeholder="e.g., Near New Campus"
+                required
+              />
+            </div>
+            <div>
+              <label for="propertyLink" class="mt-2 label"
+                >Share Property Location Link</label
+              >
+              <input
+                name="live_location_link"
+                class="input"
+                placeholder="Paste the share link here (e.g https://maps../..)"
+                title="must be a valid google map share link"
+              />
+            </div>
+          </div>
 
-            <label for="imageUpload" class="mt-2 label">Upload Image</label>
-            <input
-              type="file"
-              name="images"
-              multiple
-              accept="image/*"
-              class="input"
-            />
+          <label for="imageUpload" class="mt-2 label">Upload Image</label>
+          <input
+            type="file"
+            name="images"
+            multiple
+            accept="image/*"
+            class="input"
+          />
 
-            <label for="type">Property Type</label>
-            <select name="type" id="type" class="select" required>
-              <option value="">Select property type</option>
-              <option value="apartment">Apartment</option>
-              <option value="selfcontain">Self Contain</option>
-              <option value="flat">Flat</option>
-            </select>
+          <label for="type">Property Type</label>
+          <select name="type" id="type" class="select" required>
+            <option value="">Select property type</option>
+            <option value="apartment">Apartment</option>
+            <option value="selfcontain">Self Contain</option>
+            <option value="flat">Flat</option>
+          </select>
 
-            <label class="mt-2 label">Description</label>
-            <textarea
-              name="description"
-              rows="3"
-              class="input"
-              placeholder="Short description"
-              required
-            ></textarea>
-            <button class="btn mt-3" type="submit">Add Property</button>
-          </form>
-        </div>
+          <label class="mt-2 label">Description</label>
+          <textarea
+            name="description"
+            rows="3"
+            class="input"
+            placeholder="Short description"
+            required
+          ></textarea>
+          <button class="btn mt-3" type="submit">Add Property</button>
+        </form>
       </div>
     </div>
 

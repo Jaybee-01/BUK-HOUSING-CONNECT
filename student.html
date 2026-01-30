@@ -64,6 +64,15 @@
           </div>
 
           <button type="submit" class="btn mt-3">Save</button>
+          <button
+            type="button"
+            id="cancelProfileBtn"
+            class="btn danger mt-3"
+            style="display: none"
+            onclick="closeProfileEdit()"
+          >
+            Cancel
+          </button>
         </form>
       </div>
     </div>
@@ -74,9 +83,12 @@
       style="
         display: none;
         display: flex;
-        margin-top: 100px;
+        margin-top: 76px;
         align-items: center;
         gap: 20px;
+        position: fixed;
+        left: 0;
+        right: 0;
       "
     >
       <img
@@ -89,6 +101,7 @@
           border-radius: 50%;
           object-fit: cover;
           border: 2px solid #007bff;
+          margin-left: 95px;
         "
       />
       <div>

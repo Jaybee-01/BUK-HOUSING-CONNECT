@@ -79,6 +79,30 @@ async function deleteLandlord(id) {
   }
 }
 
+async function deleteStudent(id) {
+  try {
+    const res = await fetch(`http://localhost:3000/users/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    // If the request was successful (2xx status)
+    if (res.ok) {
+      return true;
+    }
+    // Attempt to read backend error (optional)
+    try {
+      const errorData = await res.json();
+      console.error("Delete failed:", errorData);
+    } catch (_) {
+      console.error("Delete failed: Unknown backend error");
+    }
+
+    return false;
+  } catch (err) {
+    console.error("Network error while deleting:", err);
+    return false;
+  }
+}
 
 // Rendering the Properties on dashboard
 async function renderProps() {
@@ -118,8 +142,8 @@ async function renderProps() {
 
 
       <td><button class="btn ok" data-verify="${p.id}">${
-      p.verified ? "Unverify" : "Verify"
-    }</button></td>
+        p.verified ? "Unverify" : "Verify"
+      }</button></td>
       <td><button class="btn danger" data-del="${p.id}">Delete</button></td>
     `;
     propsBody.appendChild(tr);
@@ -153,14 +177,14 @@ async function renderProps() {
           showToast("Property deleted successfully", "success", 7000);
           renderProps();
         } else {
-          showToast("Failed to delete property", "error", 7000);
+          showToast("Failed to delete property", "error", 4000);
         }
       };
 
       // NO button
       document.getElementById("confirmNo2").onclick = () => {
         overlay.style.display = "none";
-        showToast("Action canceled", "error", 7000);
+        showToast("Action cancelled", "error", 4000);
       };
     };
   });
@@ -171,7 +195,7 @@ async function renderLandlords() {
   const lordsBody = document.getElementById("landlordsTBody");
   const landlords = await fetchLandlords();
   // Note: We don't necessarily need props anymore for the contact info
-  
+
   lordsBody.innerHTML = "";
   if (!landlords || landlords.length === 0) {
     lordsBody.innerHTML = `<tr><td colspan="5" class="center">No landlords found.</td></tr>`;
@@ -183,8 +207,8 @@ async function renderLandlords() {
     const profileContact = u.contact || "-";
 
     // 2. Handle Profile Image for Admin view
-    const profileImg = u.profileImage 
-      ? `http://localhost:3000/${u.profileImage}` 
+    const profileImg = u.profileImage
+      ? `http://localhost:3000/${u.profileImage}`
       : "https://via.placeholder.com/40?text=L";
 
     const tr = document.createElement("tr");
@@ -220,7 +244,7 @@ async function renderLandlords() {
 
       document.getElementById("confirmNo").onclick = () => {
         overlay.style.display = "none";
-        showToast("Action canceled", "info", 3000);
+        showToast("Action cancelled", "error", 4000);
       };
     };
   });
@@ -229,12 +253,9 @@ async function renderLandlords() {
 // Rendering the Students
 async function renderStudents() {
   const studsBody = document.getElementById("studentTBody");
-  // Assuming fetchStudent() hits an endpoint that returns all users where role = 'student'
   const students = await fetchStudent();
 
   studsBody.innerHTML = "";
-
-  // Fixed the check: students is the array, not studsBody
   if (!students || students.length === 0) {
     studsBody.innerHTML = `<tr><td colspan="6" class="center">No Students found.</td></tr>`;
     return;
@@ -242,8 +263,8 @@ async function renderStudents() {
 
   students.forEach((u) => {
     // Construct the image URL. Use a fallback if profileImage is null.
-    const profileImgPath = u.profileImage 
-      ? `http://localhost:3000/${u.profileImage}` 
+    const profileImgPath = u.profileImage
+      ? `http://localhost:3000/${u.profileImage}`
       : "https://via.placeholder.com/40x40?text=User";
 
     const tr = document.createElement("tr");
@@ -268,13 +289,13 @@ async function renderStudents() {
   studsBody.querySelectorAll("[data-remove]").forEach((btn) => {
     btn.onclick = () => {
       const id = btn.getAttribute("data-remove");
-      const overlay = document.getElementById("confirmOverlay");
-      overlay.style.display = "flex";
+      const overlay3 = document.getElementById("confirmOverlay3");
+      overlay3.style.display = "flex";
 
-      document.getElementById("confirmYes").onclick = async () => {
-        overlay.style.display = "none";
+      document.getElementById("confirmYes3").onclick = async () => {
+        overlay3.style.display = "none";
         // Ensure you have a deleteStudent function; if not, you can use deleteLandlord if it's generic
-        const ok = await deleteStudent(id); 
+        const ok = await deleteStudent(id);
 
         if (ok) {
           showToast("Student removed successfully", "success", 4000);
@@ -284,12 +305,14 @@ async function renderStudents() {
         }
       };
 
-      document.getElementById("confirmNo").onclick = () => {
-        overlay.style.display = "none";
+      document.getElementById("confirmNo3").onclick = () => {
+        overlay3.style.display = "none";
+        showToast("Action cancelled", "error", 4000);
       };
     };
   });
 }
+
 // Initialize
 async function renderAdmin() {
   await renderProps();
