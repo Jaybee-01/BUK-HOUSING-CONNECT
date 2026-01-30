@@ -33,7 +33,7 @@ router.post("/login", async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
   const password = req.body.password;
 
-  // const { email, password } = req.body;
+// const { email, password } = req.body;
   const [rows] = await db.query("SELECT * FROM users WHERE email=?", [
     email,
   ]);
@@ -95,7 +95,7 @@ router.post("/forgot-password", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const newPassword = Math.random().toString(36).slice(-8); // random 8-char password
+    const newPassword = Math.random().toString(36).slice(-8); 
     const hashed = await bcrypt.hash(newPassword, 10);
 
     await db.query(`UPDATE users SET password = ? WHERE id = ?`, [

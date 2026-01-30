@@ -46,70 +46,6 @@ router.delete("/:id", async (req, res) => {
   res.json({ message: "Deleted" });
 });
 
-// Create a new property
-// router.post("/", upload.array("images", 5), async (req, res) => {
-//   try {
-//     let imageUrls = [];
-
-//     if(req.file && req.files.length > 0) {  
-//       imageUrls = req.files.map((file) => {
-//         return `${req.protocol}://${req.get("host")}/uploads/properties/${file.filename}`;
-//       }) 
-//     }
-    
-//     const {
-//       title,
-//       price,
-//       contact,
-//       type,
-//       location,
-//       description,
-//       // image,
-//       landlord_id,
-//     } = req.body;
-
-//     // let imageURL = null;
-
-//     // if (req.file) {
-//     //   imageURL = `${req.protocol}://${req.get("host")}/uploads/properties/${
-//     //     req.file.filename
-//     //   }`;
-//     // } else if (req.body.image) {
-//     //   imageURL = req.body.image;
-//     // }
-
-//     // if (!title || !price || !contact || !location || !landlord_id) {
-//     //   return res.status(400).json({ message: "Missing required fields" });
-//     // }
-
-//     const [result] = await db.query(
-//       `INSERT INTO properties 
-//        (title, price, contact, type, location, description, image, landlord_id) 
-//        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-//       [
-//         title,
-//         price,
-//         contact,
-//         type,
-//         location,
-//         description,
-//         imageURL,
-//         landlord_id,
-//       ]
-//     );
-
-//     // Return the newly created property
-//     const [newProp] = await db.query("SELECT * FROM properties WHERE id = ?", [
-//       result.insertId,
-//     ]);
-
-//     res.status(201).json(newProp[0]);
-//   } catch (err) {
-//     console.error("Error creating property:", err);
-//     res.status(500).json({ message: "Failed to create property" });
-//   }
-// });
-
 
 router.post("/", upload.array("images", 5), async (req, res) => {
   try {
@@ -125,6 +61,7 @@ router.post("/", upload.array("images", 5), async (req, res) => {
       price,
       contact,
       location,
+      live_location_link,
       description,
       landlord_id,
       type,
@@ -135,6 +72,7 @@ router.post("/", upload.array("images", 5), async (req, res) => {
       price,
       contact,
       location,
+      live_location_link,
       description,
       landlord_id,
       type,
@@ -145,13 +83,14 @@ router.post("/", upload.array("images", 5), async (req, res) => {
 
     const [result] = await db.execute(
       `INSERT INTO properties 
-      (title, price, contact, location, description, landlord_id, type, images, verified)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (title, price, contact, location, live_location_link, description, landlord_id, type, images, verified)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         newProp.title,
         newProp.price,
         newProp.contact,
         newProp.location,
+        newProp.live_location_link,
         newProp.description,
         newProp.landlord_id,
         newProp.type,

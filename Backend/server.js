@@ -54,7 +54,7 @@ app.use(
   cors({
     origin: "http://localhost:5501", // frontend URL
     credentials: true,
-  })
+  }),
 );
 // app.use(bodyParser.json());
 
@@ -71,7 +71,7 @@ app.use(
       secure: false,
       sameSite: "lax",
     },
-  })
+  }),
 );
 
 // --- Routes ---
@@ -79,7 +79,6 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/properties", propertyRoutes);
 app.use("/bookings", bookingRoutes);
-
 
 // static serve uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -94,7 +93,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
       const hashedPassword = await bcrypt.hash("adminpassword", 10);
       await db.query(
         "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
-        ["Administrator", "admin@buk.com", hashedPassword, "admin"]
+        ["Administrator", "admin@buk.com", hashedPassword, "admin"],
       );
       console.log("Admin user created");
     }
@@ -109,5 +108,45 @@ app.get("/me", (req, res) => {
   res.json(req.session.user);
 });
 
+// Route to update Student Profile
+app.post("/update-profile", upload.single("profileImage"), async (req, res) => {
+  // 1. Check if user is logged in
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const { department, regNo } = req.body;
+  const userId = req.session.user.id;
+
+  // 2. Get the file path if an image was uploaded
+  let profilePicPath = req.session.user.profileImage; // keep old one by default
+  if (req.file) {
+    // Save relative path for the frontend (e.g., uploads/properties/filename.jpg)
+    profilePicPath = `uploads/properties/${req.file.filename}`;
+  }
+
+  try {
+    // 3. Update MySQL Database
+    // Note: Make sure your 'users' table has 'department', 'regNo', and 'profileImage' columns
+    await db.query(
+      "UPDATE users SET department = ?, regNo = ?, profileImage = ? WHERE id = ?",
+      [department, regNo, profilePicPath, userId],
+    );
+
+    // 4. Update the Session so the frontend knows the user is now "complete"
+    req.session.user.department = department;
+    req.session.user.regNo = regNo;
+    req.session.user.profileImage = profilePicPath;
+
+    res.json({ success: true, message: "Profile updated successfully" });
+  } catch (err) {
+    console.error("Database Error:", err);
+    res.status(500).json({ error: "Failed to update database" });
+  }
+});
+
 // --- Start server ---
 app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(3000, () =>
+  console.log("Frontend running on http://localhost:5501"),
+);
