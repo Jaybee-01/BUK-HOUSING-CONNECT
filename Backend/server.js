@@ -108,37 +108,95 @@ app.get("/me", (req, res) => {
   res.json(req.session.user);
 });
 
-// Route to update Student Profile
+// // Route to update Student Profile
+// app.post("/update-profile", upload.single("profileImage"), async (req, res) => {
+//   // 1. Check if user is logged in
+//   if (!req.session.user) {
+//     return res.status(401).json({ error: "Unauthorized" });
+//   }
+
+//   const { department, regNo } = req.body;
+//   const userId = req.session.user.id;
+
+//   // 2. Get the file path if an image was uploaded
+//   let profilePicPath = req.session.user.profileImage; // keep old one by default
+//   if (req.file) {
+//     // Save relative path for the frontend (e.g., uploads/properties/filename.jpg)
+//     profilePicPath = `uploads/properties/${req.file.filename}`;
+//   }
+
+//   try {
+//     await db.query(
+//       "UPDATE users SET department = ?, regNo = ?, profileImage = ? WHERE id = ?",
+//       [department, regNo, profilePicPath, userId],
+//     );
+
+//     // 4. Update the Session so the frontend knows the user is now "complete"
+//     req.session.user.department = department;
+//     req.session.user.regNo = regNo;
+//     req.session.user.profileImage = profilePicPath;
+
+//     res.json({ success: true, message: "Profile updated successfully" });
+//   } catch (err) {
+//     console.error("Database Error:", err);
+//     res.status(500).json({ error: "Failed to update database" });
+//   }
+// });
+
+
 app.post("/update-profile", upload.single("profileImage"), async (req, res) => {
   // 1. Check if user is logged in
   if (!req.session.user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const { department, regNo } = req.body;
   const userId = req.session.user.id;
+  const userRole = req.session.user.role;
 
-  // 2. Get the file path if an image was uploaded
-  let profilePicPath = req.session.user.profileImage; // keep old one by default
+  // Destructure all possible fields from both Student and Landlord forms
+  const { department, regNo, contact } = req.body;
+
+  // 2. Handle Profile Image
+  let profilePicPath = req.session.user.profileImage; 
   if (req.file) {
-    // Save relative path for the frontend (e.g., uploads/properties/filename.jpg)
+    // Relative path for frontend serving
     profilePicPath = `uploads/properties/${req.file.filename}`;
   }
 
   try {
-    // 3. Update MySQL Database
-    // Note: Make sure your 'users' table has 'department', 'regNo', and 'profileImage' columns
+    // 3. Update Database
+    // We update all fields. If a field isn't in the form, we keep the existing session value.
     await db.query(
-      "UPDATE users SET department = ?, regNo = ?, profileImage = ? WHERE id = ?",
-      [department, regNo, profilePicPath, userId],
+      "UPDATE users SET department = ?, regNo = ?, contact = ?, profileImage = ? WHERE id = ?",
+      [
+        department || req.session.user.department || null,
+        regNo || req.session.user.regNo || null,
+        contact || req.session.user.contact || null,
+        profilePicPath,
+        userId
+      ]
     );
 
-    // 4. Update the Session so the frontend knows the user is now "complete"
-    req.session.user.department = department;
-    req.session.user.regNo = regNo;
+    // 4. Update the Session object so fetchLogged() returns fresh data
+    if (department) req.session.user.department = department;
+    if (regNo) req.session.user.regNo = regNo;
+    if (contact) req.session.user.contact = contact;
     req.session.user.profileImage = profilePicPath;
 
-    res.json({ success: true, message: "Profile updated successfully" });
+    // 5. Save session explicitly before responding
+    // This fixes the issue where the page reloads before the session is written
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session Save Error:", err);
+        return res.status(500).json({ error: "Session synchronization failed" });
+      }
+      res.json({ 
+        success: true, 
+        message: "Profile updated successfully",
+        user: req.session.user // Optional: send back updated user for debugging
+      });
+    });
+
   } catch (err) {
     console.error("Database Error:", err);
     res.status(500).json({ error: "Failed to update database" });

@@ -13,7 +13,7 @@ async function fetchProps() {
 
 async function fetchLogged() {
   const res = await fetch("http://localhost:3000/me", {
-    credentials: "include", // if using cookies for session
+    credentials: "include",
   });
   return res.ok ? res.json() : null;
 }
@@ -80,8 +80,9 @@ async function renderHome() {
       <img src="${firstImage}" style="width:100%; border-radius:8px; aspect-ratio:16/9; object-fit:cover;">
       <h3 class="mt-2">${p.title}</h3> 
       <p class="location" style="margin-top: 10px;" data-location=${p.location}><strong>${currency(
-      p.price
-        )}</strong>  •  ${p.location}</p>
+        p.price,
+      )}</strong>  •  ${p.location}</p>
+           
      <p class="mt-2" style="display:flex; gap:8px; align-items:center; margin-top: 15px;">
         <span class="badge ${p.verified ? "ok" : "warn"}">
            ${p.verified ? "Verified" : "Pending"}
@@ -89,8 +90,8 @@ async function renderHome() {
 
         ${
           p.booked
-          ? `<span class="badge danger" style="background:green; color: white">Booked</span>`
-          : ""
+            ? `<span class="badge danger" style="background:green; color: white">Booked</span>`
+            : ""
         }
       </p>
       <button class="btn mt-2" data-id="${p.id}">View Details</button>
@@ -144,7 +145,7 @@ function setupFilters() {
 }
 
 // For toast Notifications
-function showToast(message, type = "success", duration = 7000) {
+function showToast(message, type = "success", duration = 4000) {
   const container = document.getElementById("toastContainer");
   if (!container) return console.error("Toast container missing");
 
@@ -164,14 +165,14 @@ function showToast(message, type = "success", duration = 7000) {
   // Auto remove
   setTimeout(() => {
     toast.classList.add("fadeOut");
-    setTimeout(() => toast.remove(), 400);
+    setTimeout(() => toast.remove(), 4000);
   }, duration);
 }
 
 // open map function
 function openMap(location) {
   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    location
+    location,
   )}`;
   window.open(url, "_blank");
 }
@@ -179,11 +180,11 @@ function openMap(location) {
 // Property Details
 async function handleViewDetails(id) {
   const u = await fetchLogged();
-  if (!u || u.role !== "student") {
+  if (!u || (u.role !== "admin" && u.role !== "student")) {
     showToast(
       "You must log in as a Student to view details and book.",
       "error",
-      7000
+      4000,
     );
     return;
   }
@@ -216,7 +217,7 @@ async function handleViewDetails(id) {
           .map(
             (img) => `
           <img src="${img}" class="slide-img" />
-        `
+        `,
           )
           .join("")}
       </div>
@@ -230,8 +231,8 @@ async function handleViewDetails(id) {
         <h2>${p.title}</h2>
         <div>
           <span class="badge ${p.verified ? "ok" : "warn"}">${
-    p.verified ? "Verified" : "Pending"
-  }</span>
+            p.verified ? "Verified" : "Pending"
+          }</span>
         <button class="btn outline" id="closeDetails">Close</button>
         </div>
       </div>
@@ -240,8 +241,8 @@ async function handleViewDetails(id) {
 
       <p><strong>Price:</strong> ${currency(p.price)}</p>
       <p><strong>Contact:</strong> <a href="tel:234${p.contact}"> +234 ${
-    p.contact
-  }</a></p>
+        p.contact
+      }</a></p>
       <p><strong>Location:</strong> ${p.location}</p>
       <p class="mt-2">${p.description || ""}</p>
       
@@ -249,9 +250,7 @@ async function handleViewDetails(id) {
         <div class="mt-4">
           <button class="btn" id="bookNow">Book Now</button>
         </div>
-      <button class="btn mt-4" onclick="openMap('${
-        p.location
-      }')">View on Map</button>
+      <button class="btn mt-4" onclick="openMap('${p.live_location_link}')">View on Map</button>
       </div>
     </div>
   `;
@@ -295,12 +294,13 @@ async function handleViewDetails(id) {
     updateSlider();
   };
 }
+
 // Booking
-function openBooking() {
-  if (!currentProp) return;
-  document.getElementById("bkTitle").textContent = currentProp.title;
-  bookingModal.style.display = "flex";
-}
+  function openBooking() {
+    if (!currentProp) return;
+    document.getElementById("bkTitle").textContent = currentProp.title;
+    bookingModal.style.display = "flex";
+  }
 
 function closeBooking() {
   bookingModal.style.display = "none";
@@ -309,7 +309,7 @@ function closeBooking() {
 async function confirmBooking() {
   const u = await fetchLogged();
   if (!u || u.role !== "student")
-    return showToast("Login as student first.", 7000);
+    return showToast("Login as student first.", 'error', 4000);
 
   const note = document.getElementById("bkNote").value.trim();
   const booking = {
@@ -323,18 +323,18 @@ async function confirmBooking() {
   const res = await createBooking(booking);
 
   if (res) {
-    showToast("Booking sent to landlord!", "success", 7000);
+    showToast("Booking sent to landlord!", "success", 4000);
     closeBooking();
   }
 }
 //Payment section - fluterwave or paystack(for mockup payment)
-async function makePayment() {
-  showToast(
-    "Loading.... Payment section on it's way stay tuned!",
-    "success",
-    7000
-  );
-}
+// async function makePayment() {
+//   showToast(
+//     "Loading.... Payment section on it's way stay tuned!",
+//     "success",
+//     4000,
+//   );
+// }
 
 // functions for the forgot password modal
 document.addEventListener("DOMContentLoaded", () => {
@@ -366,7 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Optional: close modal if user clicks outside the box
   overlay.onclick = closeForgot;
 
-  // Form submission
+  // forgot Password
   if (forgotForm) {
     forgotForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -389,7 +389,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!res.ok) {
           alert(
-            data.message || showToast("Error resetting password", "error", 3000)
+            data.message ||
+              showToast("Error resetting password", "error", 4000),
           );
           return;
         }
@@ -398,7 +399,7 @@ document.addEventListener("DOMContentLoaded", () => {
         newPassBox.style.display = "block";
       } catch (err) {
         console.error(err);
-        showToast("Something went wrong!", "error", 3000);
+        showToast("Something went wrong!", "error", 4000);
       }
     });
   }

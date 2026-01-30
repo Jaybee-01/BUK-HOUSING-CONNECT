@@ -27,6 +27,15 @@ body {
   margin: 0 auto;
   padding: 10px;
 }
+.container2 {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-self: center;
+}
 
 /* properties - admin page */
 .properties {

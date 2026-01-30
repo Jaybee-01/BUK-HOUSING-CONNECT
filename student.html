@@ -1,60 +1,141 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Student - BUK Housing Connect</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" href="./img/main-logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Student - BUK Housing Connect</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="./img/main-logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
-</head>
+  <body>
+    <nav class="nav">
+      <div class="container">
+        <div class="brand">
+          <a href="index.html"><img src="img/main-logo.png" alt="" /></a>
+        </div>
+        <!-- <div class="brand">Student Dashboard</div> -->
+        <div>
+          <!-- <a href="index.html">Home</a> -->
+          <span id="navUser" style="margin-left: 12px"></span>
+          <span id="navActions1" style="margin-left: 12px"></span>
+        </div>
+      </div>
+    </nav>
 
-<body>
-  <nav class="nav">
-    <div class="container">
-      <div class="brand"><a href="index.html"><img src="img/main-logo.png" alt=""></a></div>
-      <!-- <div class="brand">Student Dashboard</div> -->
-      <div>
-        <!-- <a href="index.html">Home</a> -->
-        <span id="navUser" style="margin-left:12px;"></span>
-        <span id="navActions1" style="margin-left:12px;"></span>
+    <!-- for student profile -->]
+    <div id="profileSection" class="container2" style="display: none">
+      <div class="container2">
+        <h2>Update your Profile</h2>
+        <form id="profileForm" action="">
+          <div class="form-group">
+            <label for="" class="mt-2 label">Profile Picture</label>
+            <input
+              type="file"
+              name="profileImage"
+              id="profileImage"
+              accept="image/*"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="" class="mt-2 label">Department</label>
+            <input
+              type="text"
+              name="department"
+              placeholder="e.g Computer Science"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="" class="mt-2 label">Registration Number</label>
+            <input
+              type="text"
+              name="regNo"
+              placeholder="e.g CST/21/IFT/...."
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn mt-3">Save</button>
+        </form>
       </div>
     </div>
-  </nav>
 
-  <div class="container">
-    <h2>Verified Properties</h2>
-    <div id="sPropertyList" class="grid mt-3"></div>
-  </div>
+    <div
+      id="studentHeader"
+      class="card"
+      style="
+        display: none;
+        display: flex;
+        margin-top: 100px;
+        align-items: center;
+        gap: 20px;
+      "
+    >
+      <img
+        id="userAvatar"
+        src=""
+        alt="Profile"
+        style="
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #007bff;
+        "
+      />
+      <div>
+        <h2 id="userName" style="margin: 0"></h2>
+        <p style="margin: 5px 0; color: #555">
+          <span id="userDept"></span> | <span id="userReg"></span>
+        </p>
+        <button
+          class="btn"
+          onclick="toggleProfileEdit()"
+          style="padding: 5px 10px; font-size: 0.8rem"
+        >
+          Edit Profile
+        </button>
+      </div>
+    </div>
 
-  <!-- Details Overlay -->
-  <div id="sDetailsOverlay">
-    <div id="sDetailsWrap"></div>
-  </div>
+    <div class="container">
+      <h2>Verified Properties</h2>
+      <div id="sPropertyList" class="grid mt-3"></div>
+    </div>
 
-  <div id="toastContainer"></div>
-  
-  <!-- Footer section -->
-  <footer>
-    <section>
-      <img src="img/main-logo.png" alt="" width="150px">
-      <!-- <h1>🏠BUK Housing Connect</h1> -->
-      <p>Your connection to the best student housing near Bayero University, Kano.</p>
-      <hr>
+    <!-- Details Overlay -->
+    <div id="sDetailsOverlay">
+      <div id="sDetailsWrap"></div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <!-- Footer section -->
+    <footer>
       <section>
-        <p>&copy;2025 BUK Housing Connect. All rights reserved.</p>
+        <img src="img/main-logo.png" alt="" width="150px" />
+        <!-- <h1>🏠BUK Housing Connect</h1> -->
+        <p>
+          Your connection to the best student housing near Bayero University,
+          Kano.
+        </p>
+        <hr />
+        <section>
+          <p>&copy;2025 BUK Housing Connect. All rights reserved.</p>
+        </section>
       </section>
-    </section>
-  </footer>
+    </footer>
 
-
-  <script src="js/utils.js"></script>
-   <!-- <script src="./Backend/routes/auth.js"></script> -->
-  <script src="js/student.js"></script>
-</body>
-
+    <script src="js/utils.js"></script>
+    <!-- <script src="./Backend/routes/auth.js"></script> -->
+    <script src="js/student.js"></script>
+  </body>
 </html>

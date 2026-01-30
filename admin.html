@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -57,21 +57,52 @@
               <th>Name</th>
               <th>Email</th>
               <th>Contact</th>
-              <th>Role</th>
+              <!-- <th>Role</th> -->
               <th>Action</th>
             </tr>
           </thead>
           <tbody id="landlordsTBody"></tbody>
         </table>
       </div>
-    </div>
 
+
+      <!-- <div class="container"></div> -->
+      <br /><br />
+      <h3 class="mt-6">Students</h3>
+      <div class="table-wrap mt-3">
+        <table>
+          <thead>
+            <tr>
+              <th>Profile Pic</th>
+              <th>Name/Email</th>
+              <th>Registration Number</th>
+              <th>Department</th>
+              <!-- <th>Contact</th> -->
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="studentTBody"></tbody>
+        </table>
+      </div>
+    </div>
     <div id="toastContainer"></div>
 
     <div id="confirmOverlay">
       <div class="confirmBox">
         <h3>Are you sure?</h3>
         <p>This landlord and all their properties will be removed.</p>
+        <div class="row">
+          <button id="confirmYes" class="btn danger">Delete</button>
+          <button id="confirmNo" class="btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- for student -->
+    <div id="confirmOverlay">
+      <div class="confirmBox">
+        <h3>Are you sure?</h3>
+        <p>This student will be removed.</p>
         <div class="row">
           <button id="confirmYes" class="btn danger">Delete</button>
           <button id="confirmNo" class="btn">Cancel</button>
