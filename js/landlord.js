@@ -129,40 +129,84 @@ async function renderMyProps(me) {
   });
 }
 
-// show the bookings from student
+// // show the bookings from student
+// async function renderLandlordBookings() {
+//   const tbody = document.getElementById("landlordBookingsTBody");
+//   // Assuming you have a route like /bookings/landlord
+//   const res = await fetch("http://localhost:3000/bookings/landlord", { credentials: "include" });
+//   const bookings = res.ok ? await res.json() : [];
+
+//   tbody.innerHTML = "";
+//   if (bookings.length === 0) {
+//     tbody.innerHTML = `<tr><td colspan="5" class="center">No bookings received yet.</td></tr>`;
+//     return;
+//   }
+
+//   bookings.forEach(b => {
+//     const tr = document.createElement("tr");
+//     tr.innerHTML = `
+//       <td>${b.property_title}</td>
+//       <td>${b.student_name}</td>
+//       <td>${b.student_email}</td>
+//       <td>${new Date(b.created_at).toLocaleDateString()}</td>
+//       <td><span class="badge ok">Confirmed</span></td>
+//     `;
+//     tbody.appendChild(tr);
+//   });
+// }
+
 async function renderLandlordBookings() {
   const tbody = document.getElementById("landlordBookingsTBody");
-  // Assuming you have a route like /bookings/landlord
-  const res = await fetch("http://localhost:3000/bookings/landlord", { credentials: "include" });
+  const res = await fetch("http://localhost:3000/bookings/landlord", {
+    credentials: "include",
+  });
   const bookings = res.ok ? await res.json() : [];
 
   tbody.innerHTML = "";
+
   if (bookings.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="center">No bookings received yet.</td></tr>`;
     return;
   }
 
-  bookings.forEach(b => {
+  bookings.forEach((b) => {
     const tr = document.createElement("tr");
+
+    // 1. Identify the date field (matching your b.createdAt from SQL)
+    const rawDate = b.createdAt;
+
+    // 2. Safely parse and format
+    let displayDate = "N/A";
+    if (rawDate) {
+      const dateObj = new Date(rawDate);
+      // Check if the date is actually valid before formatting
+      if (!isNaN(dateObj.getTime())) {
+        displayDate = dateObj.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      }
+    }
+
     tr.innerHTML = `
       <td>${b.property_title}</td>
       <td>${b.student_name}</td>
       <td>${b.student_email}</td>
-      <td>${new Date(b.created_at).toLocaleDateString()}</td>
+      <td>${displayDate}</td>
       <td><span class="badge ok">Confirmed</span></td>
     `;
     tbody.appendChild(tr);
   });
 }
-
 // --- 4. FORM HANDLERS & TOGGLES ---
 function setupProfileForm() {
   const form = document.getElementById("landlordProfileForm");
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(form)
+    const formData = new FormData(form);
     const result = await updateProfile(formData);
-    
+
     if (result) {
       showToast("Profile updated!", "success", 4000);
       location.reload();

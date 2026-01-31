@@ -1,6 +1,5 @@
 // server.js
 const express = require("express");
-// const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const cors = require("cors");
@@ -56,7 +55,7 @@ app.use(
     credentials: true,
   }),
 );
-// app.use(bodyParser.json());
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -90,7 +89,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
       "admin@buk.com",
     ]);
     if (rows.length === 0) {
-      const hashedPassword = await bcrypt.hash("adminpassword", 10);
+      const hashedPassword = await bcrypt.hash("admin", 10);
       await db.query(
         "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
         ["Administrator", "admin@buk.com", hashedPassword, "admin"],
@@ -189,50 +188,6 @@ app.post("/update-profile", upload.single("profileImage"), async (req, res) => {
     res.status(500).json({ error: "Failed to update database" });
   }
 });
-
-// route to toggle booked and unbooked
-// app.post("/properties/toggle-booked/:id", async (req, res) => {
-//   if (!req.session.user || req.session.user.role !== "admin") {
-//     return res.status(403).json({ error: "Unauthorized" });
-//   }
-
-//   const { id } = req.params;
-//   try {
-//     // This SQL toggles between 0 and 1
-//     await db.query("UPDATE properties SET booked = 1 - booked WHERE id = ?", [
-//       id,
-//     ]);
-//     res.json({ success: true });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ error: "Failed to toggle status" });
-//   }
-// });
-
-// app.post("/properties/toggle-booked/:id", async (req, res) => {
-//   if (!req.session.user || req.session.user.role !== 'admin') {
-//     return res.status(403).json({ error: "Unauthorized" });
-//   }
-
-//   const { id } = req.params;
-
-//   try {
-//     // 1 - booked: if it's 1 it becomes 0, if it's 0 it becomes 1
-//     const [result] = await db.query(
-//       "UPDATE properties SET booked = 1 - booked WHERE id = ?",
-//       [id]
-//     );
-
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ error: "Property not found" });
-//     }
-
-//     res.json({ success: true, message: "Booking status toggled" });
-//   } catch (err) {
-//     console.error("Database Error:", err);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
 
 app.post("/properties/toggle-booked/:id", async (req, res) => {
   if (!req.session.user || req.session.user.role !== "admin") {

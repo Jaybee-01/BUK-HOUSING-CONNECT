@@ -24,18 +24,18 @@ router.get("/landlord", async (req, res) => {
   }
 
   try {
-    // We join bookings with properties to find ONLY the ones owned by this landlord
     const [rows] = await db.query(
       `
       SELECT 
         b.id, 
-        b.created_at,
+        b.createdAt, 
+        b.note,
         p.title AS property_title, 
         u.name AS student_name, 
         u.email AS student_email 
       FROM bookings b
       JOIN properties p ON b.property_id = p.id
-      JOIN users u ON b.user_id = u.id
+      JOIN users u ON b.student_id = u.id
       WHERE p.landlord_id = ?
     `,
       [req.session.user.id],
@@ -43,11 +43,10 @@ router.get("/landlord", async (req, res) => {
 
     res.json(rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("SQL Error:", err.message);
+    res.status(500).json({ error: "Failed to fetch bookings" });
   }
 });
-
 
 // Create booking
 router.post("/", async (req, res) => {
