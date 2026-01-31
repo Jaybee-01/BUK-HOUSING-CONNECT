@@ -29,7 +29,7 @@ router.get("/landlord", async (req, res) => {
       `
       SELECT 
         b.id, 
-        b.created_at, 
+        b.created_at,
         p.title AS property_title, 
         u.name AS student_name, 
         u.email AS student_email 
