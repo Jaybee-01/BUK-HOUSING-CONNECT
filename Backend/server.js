@@ -56,7 +56,6 @@ app.use(
   }),
 );
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -102,31 +101,61 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 })();
 
 // --- Authenticated user info ---
-app.get("/me", (req, res) => {
-  if (!req.session.user) return res.status(401).json({ loggedIn: false });
-  res.json(req.session.user);
-});
+// app.get("/me", (req, res) => {
+//   if (!req.session.user) return res.status(401).json({ loggedIn: false });
+//   res.json(req.session.user);
+// });
 
-//to get the bookings from student
-app.get("/bookings/landlord", async (req, res) => {
-  if (!req.session.user || req.session.user.role !== 'landlord') {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
-
+app.get("/me", async (req, res) => {
   try {
-    const [rows] = await db.query(`
-      SELECT b.*, p.title as property_title, u.name as student_name, u.email as student_email
-      FROM bookings b
-      JOIN properties p ON b.property_id = p.id
-      JOIN users u ON b.user_id = u.id
-      WHERE p.landlord_id = ?
-    `, [req.session.user.id]);
-    
-    res.json(rows);
+    if (!req.session.user) {
+      return res.status(401).json(null);
+    }
+
+    // Use [rows] because your DB driver returns an array of [results, fields]
+    const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [
+      req.session.user.id,
+    ]);
+
+    if (rows.length === 0) {
+      return res.status(404).json(null);
+    }
+
+    // Send back the first user found
+    res.json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch bookings" });
+    console.error("Error in /me route:", err);
+    res.status(500).json(null);
   }
 });
+
+// //to get the bookings from student
+// app.get("/bookings/landlord", async (req, res) => {
+//   if (!req.session.user || req.session.user.role !== "landlord") {
+//     return res.status(403).json({ error: "Unauthorized" });
+//   }
+
+//   try {
+//     const [rows] = await db.query(
+//       `
+//       SELECT b.*, p.title as property_title, u.name as student_name, u.email as student_email, u.contact as student_contact
+//       FROM bookings b
+//       JOIN properties p ON b.property_id = p.id
+//       JOIN users u ON b.student_id = u.id
+//       WHERE p.landlord_id = ?
+//     `,
+//       [req.session.user.id],
+//     );
+
+//     console.log(
+//       "SERVER DEBUG: First row contact value ->",
+//       rows[0]?.student_contact,
+//     );
+//     res.json(rows);
+//   } catch (err) {
+//     res.status(500).json({ error: "Failed to fetch bookings" });
+//   }
+// });
 
 // --- Update Profile ---
 app.post("/update-profile", upload.single("profileImage"), async (req, res) => {

@@ -129,32 +129,7 @@ async function renderMyProps(me) {
   });
 }
 
-// // show the bookings from student
-// async function renderLandlordBookings() {
-//   const tbody = document.getElementById("landlordBookingsTBody");
-//   // Assuming you have a route like /bookings/landlord
-//   const res = await fetch("http://localhost:3000/bookings/landlord", { credentials: "include" });
-//   const bookings = res.ok ? await res.json() : [];
-
-//   tbody.innerHTML = "";
-//   if (bookings.length === 0) {
-//     tbody.innerHTML = `<tr><td colspan="5" class="center">No bookings received yet.</td></tr>`;
-//     return;
-//   }
-
-//   bookings.forEach(b => {
-//     const tr = document.createElement("tr");
-//     tr.innerHTML = `
-//       <td>${b.property_title}</td>
-//       <td>${b.student_name}</td>
-//       <td>${b.student_email}</td>
-//       <td>${new Date(b.created_at).toLocaleDateString()}</td>
-//       <td><span class="badge ok">Confirmed</span></td>
-//     `;
-//     tbody.appendChild(tr);
-//   });
-// }
-
+// show the bookings from student
 async function renderLandlordBookings() {
   const tbody = document.getElementById("landlordBookingsTBody");
   const res = await fetch("http://localhost:3000/bookings/landlord", {
@@ -170,6 +145,7 @@ async function renderLandlordBookings() {
   }
 
   bookings.forEach((b) => {
+    // console.log("Booking Row:", b);
     const tr = document.createElement("tr");
 
     // 1. Identify the date field (matching your b.createdAt from SQL)
@@ -193,12 +169,14 @@ async function renderLandlordBookings() {
       <td>${b.property_title}</td>
       <td>${b.student_name}</td>
       <td>${b.student_email}</td>
+      <td>${b.student_contact || "No Contact Provided"}</td>
       <td>${displayDate}</td>
       <td><span class="badge ok">Confirmed</span></td>
     `;
     tbody.appendChild(tr);
   });
 }
+
 // --- 4. FORM HANDLERS & TOGGLES ---
 function setupProfileForm() {
   const form = document.getElementById("landlordProfileForm");

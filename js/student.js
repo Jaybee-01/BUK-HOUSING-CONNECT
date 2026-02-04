@@ -32,7 +32,61 @@ async function updateProfile(formData) {
   return res.ok ? res.json() : null;
 }
 
-//Logic to Show Profile Form First
+// //Logic to Show Profile Form First
+// async function sRender() {
+//   const u = await requireStudent();
+//   if (!u) return;
+
+//   const profileSection = document.getElementById("profileSection");
+//   const sList = document.getElementById("sPropertyList");
+//   const studentHeader = document.getElementById("studentHeader");
+//   const cancelBtn = document.getElementById("cancelProfileBtn");
+
+//   // Show form if info is missing (Department or Reg No)
+//   if (!u.department || !u.regNo) {
+//     profileSection.style.display = "block";
+//     sList.style.display = "none";
+//     studentHeader.style.display = "none";
+//     if (cancelBtn) cancelBtn.style.display = "none";
+//     setupProfileForm();
+//   } else {
+//     // Profile is complete, show the dashboard
+//     profileSection.style.display = "none";
+//     sList.style.display = "grid";
+//     studentHeader.style.display = "flex";
+
+//     // Populate the HTML fields with the user's data
+//     document.getElementById("userName").innerText = u.name || "Student";
+//     document.getElementById("userDept").innerText = u.department;
+//     document.getElementById("userReg").innerText = u.regNo;
+
+//     // Handle the Profile Image
+//     const avatar = document.getElementById("userAvatar");
+//     avatar.src = u.profileImage
+//       ? `http://localhost:3000/${u.profileImage}`
+//       : "https://via.placeholder.com/80?text=User";
+
+//     renderProperties();
+//   }
+// }
+
+// function setupProfileForm() {
+//   const form = document.getElementById("profileForm");
+//   form.onsubmit = async (e) => {
+//     e.preventDefault();
+//     const formData = new FormData(form);
+
+//     const result = await updateProfile(formData);
+//     if (result) {
+//       showToast("Profile updated successfully!", "success", 4000);
+//       location.reload(); // This triggers sRender again with new data
+//     } else {
+//       showToast("Failed to update profile. Please try again.", "error", 4000);
+//     }
+//   };
+// }
+
+// Updated sRender with "Skip" functionality
 async function sRender() {
   const u = await requireStudent();
   if (!u) return;
@@ -47,29 +101,82 @@ async function sRender() {
     profileSection.style.display = "block";
     sList.style.display = "none";
     studentHeader.style.display = "none";
-    if (cancelBtn) cancelBtn.style.display = "none";
+
+    // MODIFICATION: Always show the cancel button even on first login
+    if (cancelBtn) {
+      cancelBtn.style.display = "inline-block";
+      cancelBtn.innerText = "Skip for Now"; // Make it clear it's optional
+      cancelBtn.onclick = () => {
+        // Force show the dashboard if they click skip
+        showDashboardManually(u);
+      };
+    }
     setupProfileForm();
   } else {
-    // Profile is complete, show the dashboard
-    profileSection.style.display = "none";
-    sList.style.display = "grid";
-    studentHeader.style.display = "flex";
-
-    // Populate the HTML fields with the user's data
-    document.getElementById("userName").innerText = u.name || "Student";
-    document.getElementById("userDept").innerText = u.department;
-    document.getElementById("userReg").innerText = u.regNo;
-
-    // Handle the Profile Image
-    const avatar = document.getElementById("userAvatar");
-    avatar.src = u.profileImage
-      ? `http://localhost:3000/${u.profileImage}`
-      : "https://via.placeholder.com/80?text=User";
-
-    renderProperties();
+    // Normal flow: Profile is already complete
+    showDashboardManually(u);
   }
 }
 
+// // New Helper function to render the dashboard view
+// function showDashboardManually(u) {
+//   const profileSection = document.getElementById("profileSection");
+//   const sList = document.getElementById("sPropertyList");
+//   const studentHeader = document.getElementById("studentHeader");
+
+//   profileSection.style.display = "none";
+//   sList.style.display = "grid";
+//   studentHeader.style.display = "flex";
+
+//   // Populate data (use fallbacks in case they skipped)
+//   document.getElementById("userName").innerText = u.name || "Student";
+//   document.getElementById("userDept").innerText = u.department || "Not Set";
+//   document.getElementById("userReg").innerText = u.regNo || "Not Set";
+
+//   const avatar = document.getElementById("userAvatar");
+//   avatar.src = u.profileImage
+//     ? `http://localhost:3000/${u.profileImage}`
+//     : "https://via.placeholder.com/80?text=User";
+
+//   renderProperties();
+// }
+
+function showDashboardManually(u) {
+  const profileSection = document.getElementById("profileSection");
+  const sList = document.getElementById("sPropertyList");
+  const studentHeader = document.getElementById("studentHeader");
+
+  profileSection.style.display = "none";
+  sList.style.display = "grid";
+  studentHeader.style.display = "flex";
+
+  // Check if elements exist before setting text to avoid errors
+  const nameEl = document.getElementById("userName");
+  const deptEl = document.getElementById("userDept");
+  const regEl = document.getElementById("userReg");
+  const contactEl = document.getElementById("userContact");
+  const avatar = document.getElementById("userAvatar");
+
+  if (nameEl) nameEl.innerText = u.name || "Student";
+
+  // Use "Not Set" or "N/A" if the data is missing from the u object
+  if (deptEl) deptEl.innerText = u.department || "Department Not Set";
+  if (regEl) regEl.innerText = u.regNo || "Reg No Not Set";
+  if (contactEl) contactEl.innerText = u.contact || "Contact not set";
+
+  if (avatar) {
+    // If profileImage is missing OR null, use the placeholder
+    avatar.src =
+      u.profileImage && u.profileImage !== "null"
+        ? `http://localhost:3000/${u.profileImage}`
+        : "https://via.placeholder.com/80?text=User";
+  }
+
+  renderProperties();
+}
+
+
+// Keep your existing setupProfileForm and toggle functions...
 function setupProfileForm() {
   const form = document.getElementById("profileForm");
   form.onsubmit = async (e) => {
@@ -79,7 +186,7 @@ function setupProfileForm() {
     const result = await updateProfile(formData);
     if (result) {
       showToast("Profile updated successfully!", "success", 4000);
-      location.reload(); // This triggers sRender again with new data
+      location.reload();
     } else {
       showToast("Failed to update profile. Please try again.", "error", 4000);
     }
