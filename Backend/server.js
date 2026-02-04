@@ -101,11 +101,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 })();
 
 // --- Authenticated user info ---
-// app.get("/me", (req, res) => {
-//   if (!req.session.user) return res.status(401).json({ loggedIn: false });
-//   res.json(req.session.user);
-// });
-
 app.get("/me", async (req, res) => {
   try {
     if (!req.session.user) {
@@ -129,34 +124,6 @@ app.get("/me", async (req, res) => {
   }
 });
 
-// //to get the bookings from student
-// app.get("/bookings/landlord", async (req, res) => {
-//   if (!req.session.user || req.session.user.role !== "landlord") {
-//     return res.status(403).json({ error: "Unauthorized" });
-//   }
-
-//   try {
-//     const [rows] = await db.query(
-//       `
-//       SELECT b.*, p.title as property_title, u.name as student_name, u.email as student_email, u.contact as student_contact
-//       FROM bookings b
-//       JOIN properties p ON b.property_id = p.id
-//       JOIN users u ON b.student_id = u.id
-//       WHERE p.landlord_id = ?
-//     `,
-//       [req.session.user.id],
-//     );
-
-//     console.log(
-//       "SERVER DEBUG: First row contact value ->",
-//       rows[0]?.student_contact,
-//     );
-//     res.json(rows);
-//   } catch (err) {
-//     res.status(500).json({ error: "Failed to fetch bookings" });
-//   }
-// });
-
 // --- Update Profile ---
 app.post("/update-profile", upload.single("profileImage"), async (req, res) => {
   // 1. Check if user is logged in
@@ -178,8 +145,6 @@ app.post("/update-profile", upload.single("profileImage"), async (req, res) => {
   }
 
   try {
-    // 3. Update Database
-    // We update all fields. If a field isn't in the form, we keep the existing session value.
     await db.query(
       "UPDATE users SET department = ?, regNo = ?, contact = ?, profileImage = ? WHERE id = ?",
       [

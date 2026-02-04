@@ -12,17 +12,6 @@ async function fetchProps() {
   return res.ok ? res.json() : [];
 }
 
-// async function toggleBooked(id) {
-//   const res = await fetch(
-//     `http://localhost:3000/properties/toggle-booked/${id}`,
-//     {
-//       method: "POST",
-//       credentials: "include",
-//     },
-//   );
-//   return res.ok;
-// }
-
 async function toggleBooked(id) {
   try {
     const res = await fetch(

@@ -1,4 +1,4 @@
-// // Ensure only landlords access this page
+// Ensure only landlords access this page
 async function requireLandlord() {
   const me = await fetchLogged();
   if (!me || me.role !== "landlord") {
@@ -21,7 +21,7 @@ async function fetchProps() {
   return res.ok ? res.json() : [];
 }
 
-// --- 2. API ACTIONS ---
+// API ACTIONS 
 async function updateProfile(formData) {
   const res = await fetch("http://localhost:3000/update-profile", {
     method: "POST",
@@ -59,7 +59,7 @@ async function lRender() {
   const addPropertyWrapper = document.getElementById("addPropertyWrapper");
   const cancelBtn = document.getElementById("cancelLandlordEdit");
 
-  // Step A: Check if profile is incomplete
+  // Check if profile is incomplete
   if (!me.contact) {
     profileSection.style.display = "block";
     landlordHeader.style.display = "none";
@@ -68,7 +68,7 @@ async function lRender() {
     if (cancelBtn) cancelBtn.style.display = "none";
     setupProfileForm();
   }
-  // Step B: Profile is complete, show dashboard
+  // Profile is complete, show dashboard
   else {
     profileSection.style.display = "none";
     landlordHeader.style.display = "flex";
@@ -148,14 +148,12 @@ async function renderLandlordBookings() {
     // console.log("Booking Row:", b);
     const tr = document.createElement("tr");
 
-    // 1. Identify the date field (matching your b.createdAt from SQL)
     const rawDate = b.createdAt;
 
-    // 2. Safely parse and format
+
     let displayDate = "N/A";
     if (rawDate) {
       const dateObj = new Date(rawDate);
-      // Check if the date is actually valid before formatting
       if (!isNaN(dateObj.getTime())) {
         displayDate = dateObj.toLocaleDateString("en-GB", {
           day: "2-digit",
@@ -177,7 +175,7 @@ async function renderLandlordBookings() {
   });
 }
 
-// --- 4. FORM HANDLERS & TOGGLES ---
+// Handles forms and toggles
 function setupProfileForm() {
   const form = document.getElementById("landlordProfileForm");
   form.onsubmit = async (e) => {
@@ -208,7 +206,7 @@ function setupAddPropertyForm(me) {
     if (result) {
       showToast("Property added successfully!", "success", 4000);
       // form.reset();
-      toggleAddForm(); // Hide form
+      toggleAddForm();
       renderMyProps(me);
     }
   };

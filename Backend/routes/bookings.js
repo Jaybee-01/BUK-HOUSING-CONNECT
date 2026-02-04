@@ -2,32 +2,6 @@ const express = require("express");
 const db = require("../db");
 const router = express.Router();
 
-// // Inside routes/bookings.js
-// router.get("/landlord", async (req, res) => {
-//   if (!req.session.user || req.session.user.role !== "landlord") {
-//     return res.status(403).json({ error: "Unauthorized" });
-//   }
-
-//   try {
-//     // Note: Use 'db' if you imported it there, or 'router' if that's how it's setup
-//     const [rows] = await db.query(
-//       `SELECT b.*, p.title as property_title, u.name as student_name, 
-//               u.email as student_email, u.contact as student_contact
-//        FROM bookings b
-//        JOIN properties p ON b.property_id = p.id
-//        JOIN users u ON b.student_id = u.id
-//        WHERE p.landlord_id = ?`,
-//       [req.session.user.id],
-//     );
-//     console.log("SERVER DEBUG: Found bookings:", rows.length);
-//     res.json(rows);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: "Failed to fetch bookings" });
-//   }
-// });
-
-
 // Get bookings
 router.get("/landlord", async (req, res) => {
   if (!req.session.user || req.session.user.role !== "landlord") {
@@ -93,6 +67,5 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: "Failed to create booking" });
   }
 });
-
 
 module.exports = router;
