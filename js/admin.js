@@ -90,6 +90,92 @@ async function deleteLandlord(id) {
   }
 }
 
+// handle view details
+async function handleViewDetails(id) {
+  const props = await fetchProps();
+  const p = props.find((x) => x.id.toString() === id);
+  if (!p) {
+    showToast("Property not found", "error");
+    return;
+  }
+
+  // Define global-like variables if not already defined at the top of admin.js
+  const detailsOverlay = document.getElementById("detailsOverlay");
+  const detailsWrap = document.getElementById("detailsWrap");
+
+  let images = [];
+  try {
+    images = JSON.parse(p.images || "[]");
+  } catch {
+    images = p.images ? [p.images] : [];
+  }
+
+  if (!images.length) {
+    images = ["https://via.placeholder.com/1000x560?text=No+Image+Available"];
+  }
+
+  let sliderHTML = `
+  <div class="slider-container">
+     <button class="slide-btn" id="prevSlide">&#10094;</button>
+      <div class="slider-track">
+        ${images.map(img => `<img src="${img}" class="slide-img" />`).join("")}
+      </div>
+     <button class="slide-btn" id="nextSlide">&#10095;</button>
+    </div>
+  `;
+
+  detailsWrap.innerHTML = `
+    <div class="details-inner">
+      <div class="details-header">
+        <h2>${p.title}</h2>
+        <div>
+          <span class="badge ${p.verified ? "ok" : "warn"}">${p.verified ? "Verified" : "Pending"}</span>
+          <button class="btn outline" id="closeDetails">Close</button>
+        </div>
+      </div>
+      ${sliderHTML}
+      <p><strong>Price:</strong> ${currency(p.price)}</p>
+      <p><strong>Landlord:</strong> ${p.landlord_email}</p>
+      <p><strong>Contact:</strong> <a href="tel:234${p.contact}"> +234 ${p.contact}</a></p>
+      <p><strong>Location:</strong> ${p.location}</p>
+      <p class="mt-2">${p.description || "No description provided."}</p>
+      
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:20px;">
+        <a href="${p.live_location_link}" target="_blank" class="btn" rel="noopener noreferrer" style="text-decoration: none;">
+            View on Map
+        </a>
+      </div>
+    </div>
+  `;
+
+  detailsOverlay.style.display = "block";
+
+  document.getElementById("closeDetails").onclick = () => (detailsOverlay.style.display = "none");
+
+  // Slider Logic
+  const track = detailsWrap.querySelector(".slider-track");
+  const slides = Array.from(track.querySelectorAll(".slide-img"));
+  let index = 0;
+
+  track.style.display = "flex";
+  track.style.transition = "transform 0.4s ease";
+  track.style.width = `${slides.length * 100}%`;
+  slides.forEach(slide => { slide.style.width = `${100 / slides.length}%`; });
+
+  function updateSlider() {
+    track.style.transform = `translateX(-${index * (100 / slides.length)}%)`;
+  }
+
+  document.getElementById("prevSlide").onclick = () => {
+    index = index === 0 ? slides.length - 1 : index - 1;
+    updateSlider();
+  };
+
+  document.getElementById("nextSlide").onclick = () => {
+    index = index === slides.length - 1 ? 0 : index + 1;
+    updateSlider();
+  };
+}
 async function deleteStudent(id) {
   try {
     const res = await fetch(`http://localhost:3000/users/${id}`, {
@@ -139,11 +225,13 @@ async function renderProps() {
       <td>${p.location}</td>
       <td>${p.landlord_email}</td>
      
-      <td>${
-        p.verified
-          ? '<span class="badge ok">Yes</span>'
-          : '<span class="badge warn">No</span>'
+      <td>${p.verified
+        ? '<span class="badge ok">Yes</span>'
+        : '<span class="badge warn">No</span>'
       }</td>
+      <td>
+        <button class="btn info" data-view="${p.id}">View</button>
+      </td>
 
       <td>${created ? new Date(created).toLocaleString() : "N/A"}</td>
       <td>
@@ -153,8 +241,7 @@ async function renderProps() {
       </td>
 
 
-      <td><button class="btn ok" data-verify="${p.id}">${
-        p.verified ? "Unverify" : "Verify"
+      <td><button class="btn ok" data-verify="${p.id}">${p.verified ? "Unverify" : "Verify"
       }</button></td>
       <td><button class="btn danger" data-del="${p.id}">Delete</button></td>
     `;
@@ -173,6 +260,14 @@ async function renderProps() {
       }
     };
   });
+
+  // View details buttons
+  propsBody.querySelectorAll("[data-view]").forEach((btn) => {
+  btn.onclick = () => {
+    const id = btn.getAttribute("data-view");
+    handleViewDetails(id);
+  };
+});
 
   // To verify/unverify and delete buttons
   propsBody.querySelectorAll("[data-verify]").forEach((btn) => {
