@@ -184,10 +184,10 @@ function setupProfileForm() {
     const result = await updateProfile(formData);
 
     if (result) {
-      showToast("Profile updated!", "success", 4000);
+      showToast("Profile updated!", "success", 2000);
       location.reload();
     } else {
-      showToast("Error updating profile.", "error", 4000);
+      showToast("Error updating profile.", "error", 2000);
     }
   };
 }
@@ -204,7 +204,7 @@ function setupAddPropertyForm(me) {
 
     const result = await createProp(fd);
     if (result) {
-      showToast("Property added successfully!", "success", 4000);
+      showToast("Property added successfully!", "success", 2000);
       // form.reset();
       toggleAddForm();
       renderMyProps(me);

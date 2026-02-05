@@ -108,10 +108,10 @@ function setupProfileForm() {
 
     const result = await updateProfile(formData);
     if (result) {
-      showToast("Profile updated successfully!", "success", 4000);
+      showToast("Profile updated successfully!", "success", 2000);
       location.reload();
     } else {
-      showToast("Failed to update profile. Please try again.", "error", 4000);
+      showToast("Failed to update profile. Please try again.", "error", 2000);
     }
   };
 }

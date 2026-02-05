@@ -34,7 +34,7 @@ async function createBooking(booking) {
   const data = await res.json();
 
   if (!res.ok) {
-    showToast(data.message || "Booking Failed!", "error", 4000);
+    showToast(data.message || "Booking Failed!", "error", 2000);
     return null;
   }
 
@@ -80,19 +80,18 @@ async function renderHome() {
       <img src="${firstImage}" style="width:100%; border-radius:8px; aspect-ratio:16/9; object-fit:cover;">
       <h3 class="mt-2">${p.title}</h3> 
       <p class="location" style="margin-top: 10px;" data-location=${p.location}><strong>${currency(
-        p.price,
-      )}</strong>  •  ${p.location}</p>
+      p.price,
+    )}</strong>  •  ${p.location}</p>
            
      <p class="mt-2" style="display:flex; gap:8px; align-items:center; margin-top: 15px;">
         <span class="badge ${p.verified ? "ok" : "warn"}">
            ${p.verified ? "Verified" : "Pending"}
         </span>
 
-       ${
-         Number(p.booked) > 0
-           ? `<span class="badge" style="background: #28a745; color: white;">Booked</span>`
-           : `<span class="badge" style="background: #6c757d; color: white;">Available</span>`
-       }
+       ${Number(p.booked) > 0
+        ? `<span class="badge" style="background: #28a745; color: white;">Booked</span>`
+        : `<span class="badge" style="background: #6c757d; color: white;">Available</span>`
+      }
       </p>
       <button class="btn mt-2" data-id="${p.id}">View Details</button>
     `;
@@ -106,7 +105,7 @@ async function renderHome() {
   });
 }
 
-//  Filters
+//  search filters
 function setupFilters() {
   const priceRange = document.getElementById("priceRange");
   const priceValue = document.getElementById("priceValue");
@@ -115,6 +114,7 @@ function setupFilters() {
     priceValue.textContent = Number(priceRange.value).toLocaleString();
   });
 
+  // for location search
   document.getElementById("searchInput").addEventListener("input", function () {
     const query = this.value.toLowerCase().trim();
     const cards = document.querySelectorAll(".card");
@@ -126,6 +126,7 @@ function setupFilters() {
     });
   });
 
+  // for type filter
   document.getElementById("type").addEventListener("change", function () {
     const selectedType = this.value.toLowerCase();
     document.querySelectorAll(".card").forEach((card) => {
@@ -135,6 +136,7 @@ function setupFilters() {
     });
   });
 
+  // for price filter
   priceRange.addEventListener("input", () => {
     const selectedValue = Number(priceRange.value);
     document.querySelectorAll(".card").forEach((card) => {
@@ -145,7 +147,7 @@ function setupFilters() {
 }
 
 // For toast Notifications
-function showToast(message, type = "success", duration = 4000) {
+function showToast(message, type = "success", duration = 2000) {
   const container = document.getElementById("toastContainer");
   if (!container) return console.error("Toast container missing");
 
@@ -165,7 +167,7 @@ function showToast(message, type = "success", duration = 4000) {
   // Auto remove
   setTimeout(() => {
     toast.classList.add("fadeOut");
-    setTimeout(() => toast.remove(), 4000);
+    setTimeout(() => toast.remove(), 2000);
   }, duration);
 }
 
@@ -184,7 +186,7 @@ async function handleViewDetails(id) {
     showToast(
       "You must log in as a Student to view details and book.",
       "error",
-      4000,
+      2000,
     );
     return;
   }
@@ -214,12 +216,12 @@ async function handleViewDetails(id) {
      <button class="slide-btn" id="prevSlide">&#10094;</button>
       <div class="slider-track">
         ${images
-          .map(
-            (img) => `
+      .map(
+        (img) => `
           <img src="${img}" class="slide-img" />
         `,
-          )
-          .join("")}
+      )
+      .join("")}
       </div>
       <button class="slide-btn" id="nextSlide">&#10095;</button>
     </div>
@@ -230,9 +232,8 @@ async function handleViewDetails(id) {
       <div class="details-header">
         <h2>${p.title}</h2>
         <div>
-          <span class="badge ${p.verified ? "ok" : "warn"}">${
-            p.verified ? "Verified" : "Pending"
-          }</span>
+          <span class="badge ${p.verified ? "ok" : "warn"}">${p.verified ? "Verified" : "Pending"
+    }</span>
         <button class="btn outline" id="closeDetails">Close</button>
         </div>
       </div>
@@ -240,9 +241,8 @@ async function handleViewDetails(id) {
      ${sliderHTML}
 
       <p><strong>Price:</strong> ${currency(p.price)}</p>
-      <p><strong>Contact:</strong> <a href="tel:234${p.contact}"> +234 ${
-        p.contact
-      }</a></p>
+      <p><strong>Contact:</strong> <a href="tel:234${p.contact}"> +234 ${p.contact
+    }</a></p>
       <p><strong>Location:</strong> ${p.location}</p>
       <p class="mt-2">${p.description || ""}</p>
       
@@ -250,7 +250,9 @@ async function handleViewDetails(id) {
         <div class="mt-4">
           <button class="btn" id="bookNow">Book Now</button>
         </div>
-      <button class="btn mt-4" onclick="openMap('${p.live_location_link}')">View on Map</button>
+        <a href="${p.live_location_link}" target="_blank" class="btn mt-4" rel="noopener noreferrer" style="text-decoration: none; font-size: 0.9rem;">
+    View on Map
+</a>
       </div>
     </div>
   `;
@@ -309,7 +311,7 @@ function closeBooking() {
 async function confirmBooking() {
   const u = await fetchLogged();
   if (!u || u.role !== "student")
-    return showToast("Login as student first.", "error", 4000);
+    return showToast("Login as student first.", "error", 2000);
 
   const note = document.getElementById("bkNote").value.trim();
   const booking = {
@@ -323,18 +325,10 @@ async function confirmBooking() {
   const res = await createBooking(booking);
 
   if (res) {
-    showToast("Booking sent to landlord!", "success", 4000);
+    showToast("Booking sent to landlord!", "success", 2000);
     closeBooking();
   }
 }
-//Payment section - fluterwave or paystack(for mockup payment)
-// async function makePayment() {
-//   showToast(
-//     "Loading.... Payment section on it's way stay tuned!",
-//     "success",
-//     4000,
-//   );
-// }
 
 // functions for the forgot password modal
 document.addEventListener("DOMContentLoaded", () => {
@@ -390,7 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!res.ok) {
           alert(
             data.message ||
-              showToast("Error resetting password", "error", 4000),
+            showToast("Error resetting password", "error", 2000),
           );
           return;
         }
@@ -399,7 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
         newPassBox.style.display = "block";
       } catch (err) {
         console.error(err);
-        showToast("Something went wrong!", "error", 4000);
+        showToast("Something went wrong!", "error", 2000);
       }
     });
   }

@@ -7,11 +7,11 @@ async function signup() {
   const role = document.getElementById("signupRole").value;
 
   if (!name || !email || !password)
-    return showToast("Fill all signup fields.", "error", 4000);
+    return showToast("Fill all signup fields.", "error", 2000);
 
   // --- BUK EMAIL RESTRICTION ---
   if (role === "student" && !email.endsWith("@buk.edu.ng")) {
-    return showToast("Students must use a @buk.edu.ng email address.", "error", 5000);
+    return showToast("Students must use a @buk.edu.ng email address.", "error", 2000);
   }
 
   try {
@@ -23,14 +23,14 @@ async function signup() {
     });
 
     if (res.ok) {
-      showToast("Signup successful. You can log in now.", "success", 4000);
+      showToast("Signup successful. You can log in now.", "success", 2000);
       switchToLogin();
     } else {
       const data = await res.json();
-      showToast(data.message || "Signup failed.", "error", 4000);
+      showToast(data.message || "Signup failed.", "error", 2000);
     }
   } catch (err) {
-    showToast("Error connecting to server.", "error", 4000);
+    showToast("Error connecting to server.", "error", 2000);
     console.error(err);
   }
 }
@@ -59,7 +59,7 @@ async function login() {
       // --- LOGIN RESTRICTION ---
       // This prevents students who somehow bypassed signup from logging in with a non-BUK email
       if (data.role === "student" && !email.endsWith("@buk.edu.ng")) {
-        return showToast("Enter valid Email Address", "error", 5000);
+        return showToast("Enter valid Email Address", "error", 2000);
       }
 
       if (data.role === "admin") location.href = "admin.html";
@@ -67,10 +67,10 @@ async function login() {
       else if (data.role === "student") location.href = "student.html";
       else location.href = "index.html";
     } else {
-      showToast(data.message || "Invalid credentials.", "error", 4000);
+      showToast(data.message || "Invalid credentials.", "error", 2000);
     }
   } catch (err) {
-    showToast("Error connecting to server.", "error");
+    showToast("Error connecting to server.", "error", 2000);
     console.error(err);
   }
 }

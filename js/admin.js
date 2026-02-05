@@ -166,10 +166,10 @@ async function renderProps() {
       const id = btn.getAttribute("data-booked");
       const ok = await toggleBooked(id); // You'll need the toggleBooked API function
       if (ok) {
-        showToast("Status updated", "success", 3000);
+        showToast("Status updated", "success", 2000);
         renderProps();
       } else {
-        showToast("Failed to update status", "error", 4000);
+        showToast("Failed to update status", "error", 2000);
       }
     };
   });
@@ -199,17 +199,17 @@ async function renderProps() {
         const ok = await deleteProperty(id);
 
         if (ok) {
-          showToast("Property deleted successfully", "success", 7000);
+          showToast("Property deleted successfully", "success", 2000);
           renderProps();
         } else {
-          showToast("Failed to delete property", "error", 4000);
+          showToast("Failed to delete property", "error", 2000);
         }
       };
 
       // NO button
       document.getElementById("confirmNo2").onclick = () => {
         overlay.style.display = "none";
-        showToast("Action cancelled", "error", 4000);
+        showToast("Action cancelled", "error", 2000);
       };
     };
   });
@@ -260,16 +260,16 @@ async function renderLandlords() {
         overlay.style.display = "none";
         const ok = await deleteLandlord(id);
         if (ok) {
-          showToast("Landlord removed successfully", "success", 4000);
+          showToast("Landlord removed successfully", "success", 2000);
           renderLandlords();
         } else {
-          showToast("Failed to remove landlord", "error", 4000);
+          showToast("Failed to remove landlord", "error", 2000);
         }
       };
 
       document.getElementById("confirmNo").onclick = () => {
         overlay.style.display = "none";
-        showToast("Action cancelled", "error", 4000);
+        showToast("Action cancelled", "error", 2000);
       };
     };
   });
@@ -303,6 +303,7 @@ async function renderStudents() {
       </td>
       <td>${u.regNo || '<span class="text-muted">Not Set</span>'}</td>
       <td>${u.department || '<span class="text-muted">Not Set</span>'}</td>
+      <td>${u.contact || '<span class="text-muted">Not Set</span>'}</td>
       <td>
         <button class="btn danger" style="padding: 5px 10px;" data-remove="${u.id}">Remove</button>
       </td>
@@ -323,16 +324,16 @@ async function renderStudents() {
         const ok = await deleteStudent(id);
 
         if (ok) {
-          showToast("Student removed successfully", "success", 4000);
+          showToast("Student removed successfully", "success", 2000);
           renderStudents();
         } else {
-          showToast("Failed to remove student", "error", 4000);
+          showToast("Failed to remove student", "error", 2000);
         }
       };
 
       document.getElementById("confirmNo3").onclick = () => {
         overlay3.style.display = "none";
-        showToast("Action cancelled", "error", 4000);
+        showToast("Action cancelled", "error", 2000);
       };
     };
   });
